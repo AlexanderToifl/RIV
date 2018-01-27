@@ -1,0 +1,132 @@
+\documentclass[a4paper, 10pt, 
+               numbers=noenddot, toc=graduated,
+               headsepline=true, footsepline=true,
+               twoside=false, titlepage=true, 
+               bibliography=totoc]{scrartcl}
+
+
+
+\usepackage[a4paper, top = 2.5cm,
+  	bottom = 2.0cm,
+    left   = 2.0cm,
+    right  = 2.0cm]{geometry}
+
+\usepackage{graphicx}
+\usepackage{amsmath} %math package
+\usepackage{amssymb}
+\usepackage[font={footnotesize}, bf]{caption}
+\renewcommand{\arraystretch}{1.2}
+
+\usepackage{longtable}
+\usepackage{lscape}
+%\usepackage{siunitx}	
+%\usepackage{citesort} 
+
+\usepackage[toc,page]{appendix}
+\setlength\parindent{0pt}
+\usepackage{subcaption}
+\usepackage{cite} 
+%\usepackage{float} 
+\usepackage[utf8x]{inputenc}		% input encoding
+\usepackage[ngerman]{babel} 
+\captionsetup{format=plain}
+\addto\captionsenglish{\renewcommand{\figurename}{Fig.}}
+\addto\captionsenglish{\renewcommand{\tablename}{Tab.}}
+\usepackage[T1]{fontenc}                % mathmode for font Palatino
+%\usepackage[plainfootsepline ,autooneside]{scrpage2}	% header and footer for komascript
+\usepackage{hyperref}
+\usepackage[procnames]{listings}
+
+\usepackage{url}
+\usepackage{titling}
+\usepackage{multirow}
+ 
+
+\usepackage{floatrow}
+% Table float box with bottom caption, box width adjusted to content
+\newfloatcommand{capbtabbox}{table}[][\FBwidth]
+
+
+\usepackage{array}
+
+\makeatletter
+\newcommand{\thickhline}{%
+    \noalign {\ifnum 0=`}\fi \hrule height 1pt
+    \futurelet \reserved@a \@xhline
+}
+\newcolumntype{"}{@{\hskip\tabcolsep\vrule width 1pt\hskip\tabcolsep}}
+\makeatother
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\fancyhf{}
+%\fancyheadoffset{0 cm}
+
+%\rhead{\nouppercase\rightmark}
+%\lhead{\thepage}
+
+\newif\ifinternal
+
+\internalfalse
+
+\newcommand*\mean[1]{\overline{#1}}
+
+\begin{document}
+
+\title{Bestimmung der strahlungsinduzierten Viskosit{\"a}t mit Hilfe von LAMMPS}
+\author{Christian Schleich, Alexander Toifl}
+
+\begin{center}
+\huge{\thetitle} \\
+\small{\theauthor, \today}
+\end{center}
+
+%\tableofcontents
+\hspace{1 cm}
+
+
+\section{Strahlungsinduzierte und dynamische Viskosität}
+\begin{itemize}
+	 \item Definition der Strahlungsinduzierten Fluidität $H = \frac 1 {\eta \dot{\phi}}$ ($\eta$ ... Viskosität, $\dot{\phi}$ ... 'flux') \cite{Mayr2003}
+\end{itemize}
+
+
+\section{MD Methoden zur Bestimmung der Viskosität}
+
+\subsection{Non-equilibrium MD (NEMD) Simulationen}
+
+	\subsubsection{SLLOD}
+		\begin{itemize}
+		 	\item Zusammenfassende Beschreibung \cite{Tenney2010} 
+		\end{itemize}
+		
+	\subsubsection{Moving Walls}
+
+\subsection{Reverse Non-Equlibirium MD  (rNEMD) Simulationen}
+	\begin{itemize}
+		 \item Zusammenfassende Beschreibung \cite{Tenney2010} 
+		 \item LAMMPS MD Simulationen \cite{Tenney2010} 
+	\end{itemize}
+
+
+
+\subsection{Autokorrelation des Drucktensors (Green-Kubo)}
+	\begin{itemize}
+		 \item Zusammenfassende Beschreibung \cite{Tenney2010}
+		 \item Mathematische Formulierung  \cite{Tenney2010} (in Abschnitt EMD, eher minimal gehalten), \cite{Kirova2015} (etwas ausführlicher)
+	\end{itemize}
+
+\subsection{Einstein Formulierung der Green-Kubo Methode}
+	\begin{itemize}
+		 \item Zusammenfassende Beschreibung \cite{Tenney2010}
+		 \item Mathematische Formulierung  \cite{Tenney2010} (in Abschnitt EMD)
+	\end{itemize}
+
+
+
+
+\bibliographystyle{Citation/IEEEbib-c.bst}
+\bibliography{Citation/MolecularDynamics}
+
+
+\end{document}  
