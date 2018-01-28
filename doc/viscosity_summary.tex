@@ -95,12 +95,20 @@
 
 \subsection{Non-equilibrium MD (NEMD) Simulationen}
 
+System wird verformt (Scherung) und die resultierende Spannung wird ermittelt. 
+
+
 	\subsubsection{SLLOD}
 		\begin{itemize}
 		 	\item Zusammenfassende Beschreibung \cite{Tenney2010} 
+		 	\item Original Paper, indem SLLOD Dynamik vorgestellt werden \cite{Evans1984}
+		 	\item LAMMPS: Simulationsbox wird geschert. Kombination von fix nvt/sllod und fix deform.
 		\end{itemize}
 		
 	\subsubsection{Moving Walls}
+	    \begin{itemize}
+		 	\item LAMMPS: 'walls' werden definiert, eine ist ortfest, die zweite bewegt sich. Damit wird Scherung erreicht
+		\end{itemize}
 
 \subsection{Reverse Non-Equlibirium MD  (rNEMD) Simulationen}
 	\begin{itemize}
@@ -114,6 +122,7 @@
 	\begin{itemize}
 		 \item Zusammenfassende Beschreibung \cite{Tenney2010}
 		 \item Mathematische Formulierung  \cite{Tenney2010} (in Abschnitt EMD, eher minimal gehalten), \cite{Kirova2015} (etwas ausführlicher)
+		 \item Bsp in LAMMPS verweist auf \cite{Daivis1994}
 	\end{itemize}
 
 \subsection{Einstein Formulierung der Green-Kubo Methode}
