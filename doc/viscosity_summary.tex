@@ -19,7 +19,7 @@
 
 \usepackage{longtable}
 \usepackage{lscape}
-%\usepackage{siunitx}	
+\usepackage{siunitx}	
 %\usepackage{citesort} 
 
 \usepackage[toc,page]{appendix}
@@ -106,8 +106,9 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 
 	\subsubsection{SLLOD}
 		\begin{itemize}
-		 	\item Zusammenfassende Beschreibung \cite{Tenney2010} 
 		 	\item Original Paper, indem SLLOD Dynamik vorgestellt werden \cite{Evans1984}
+		 	\item Dem System wird eine Schergeschwindigkeit (shear rate) $\dot{\gamma}$ aufgezwungen. Als Folge ergibt sich ein Impulsfluss, der über die Nebendiagonalelemente des Spannungs- oder Drucktensors gemessen wird\cite{Tenney2010}.
+		 	\item Problem: Druck variiert typischerweise sehr stark in MD Simulationen, daher ist die Konvergenz eher langsam\cite{Tenney2010}.
 		 	\item LAMMPS: Simulationsbox wird geschert. Kombination von fix nvt/sllod und fix deform.
 		\end{itemize}
 		
@@ -118,8 +119,45 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 
 \subsection{Reverse Non-Equlibirium MD  (rNEMD) Simulationen}
 	\begin{itemize}
-		 \item Zusammenfassende Beschreibung \cite{Tenney2010} 
-		 \item LAMMPS MD Simulationen \cite{Tenney2010} 
+		 \item Zusammenfassende Beschreibung in \cite{Tenney2010} 
+		  \item \textbf{Impulsfluss} wird vorgegeben und die \textbf{Schergeschwindigkeit} (Geschwindigkeitsprofil) wird gemessen.
+		  \item Vorteil: Schergeschwindigkeit ist leichter aus MD Simulationen zu ermitteln
+		  \item Simulationsbox wird in N kline Kästchen entlang der z-Achse eingeteilt
+		  \item Vorgabe der Schergeschwindigkeit: \textbf{Periodischer} Tausch von Momenten (momenta swaps) 
+		  		\begin{itemize}
+			  		\item Ursprüngliche Implementierung: x-Komponente des Impulses des Atoms mit der negativsten Impulskompentente in Kästchen 1 $p_{x,n_1}$ wird mit der x-Komplente des Atomes mit der positivsten Impulskomponente im Kästchen $n = n_c = N/2 + 1$, $p_{x,n_c}$ getauscht.
+			  		\item Lammps-Implementierung: Eine Zielgeschwindigkeit $\pm v_{x,t}$ wird definiert. Impuls der beiden Atome, die jeweils am knappsten am positiven/negativen Wert liegt, wird getauscht.
+		  		\end{itemize}
+		  \item Da Gesamtimpuls und kinetische Energie erhalten bleiben, ist prinzipiell kein Thermostat nötig
+		  \item Die Tauschfrequenz bestimmt den insgesamt ins System eingeprägten Impulsfluss.
+		  \item Das System antwortet auf den unphysikalisch erzwungenden Fluss mit einem 'echten' Impulsfluss in die entgegengesetzte Richtung. Dadurch ergeben sich Geschwindigkeitsprofile in der oberen und unteren Hälfte der Simulationsbox.
+		  
+  		  \item Berechnung der Viskosität
+  		  		 \begin{equation}
+  		   		 	\eta = \frac{-j_{xz} }{\dot{\gamma} },\quad j_{xz} = \frac{p_{\mathrm{total}}}{2 t L_x L_y},\quad p_{\mathrm{total} }= \sum (p_{x,n_c} - p_{x,n_1})
+  		   		\end{equation}
+  		   
+  		   $j_{xz}$ ... Eingeprägter Impulsfluss, $L_x,\,L_y$ ... Längen der Kästchen, $t$ ... Zeit\\
+  		   $\dot{\gamma} = \frac{\mathrm{d}v_x}{\mathrm{dz}}$ ergibt sich aus der Geschwindigkeitsverteilung
+		  
+		 \item Setup der LAMMPS MD Simulationen von \cite{Tenney2010} 
+		 		\begin{itemize}
+		 			\item 3D orthogonale Simulationsbox
+		 			\item Periodische RB
+		 			\item Verlet Zeitschrittverfahren
+		 			\item Equilibrisierung bei \SI{10}{K} mithilfe eines Berendesen Thermostats (kein Impulstausch findet statt)
+		 			\item Simulationbox wird in 20 Kästchen entlang der z-Achse eingeteilt
+		 			\item Impulstausch zwischen erster und mittlerer Box
+		 			\item Tauschfrequenz: Nach jedem 1., 10., 100. Simulationszeitschritt
+		 		\end{itemize}
+		 	
+		 
+		 
+		\begin{figure}[H]
+	    	\includegraphics[width=0.4\textwidth]{figs/rnemd_box}%
+	    	\caption{RNEMD simulation box \cite{Tenney2010}, Fig. 1.}
+   		\end{figure}		 
+		 
 	\end{itemize}
 
 
@@ -143,7 +181,6 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 	\begin{itemize}
 		\item Betrachtungen für $SiO_2$ in \cite{Snoeks2000}
 	\end{itemize}
-
 
 
 
