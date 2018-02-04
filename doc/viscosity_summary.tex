@@ -57,6 +57,8 @@
 \newcolumntype{"}{@{\hskip\tabcolsep\vrule width 1pt\hskip\tabcolsep}}
 \makeatother
 
+\newcommand{\refeqn}[1]  {Glg.~\ref{#1}}  
+
 %\usepackage{fancyhdr}
 %\pagestyle{fancy}
 %\fancyhf{}
@@ -90,7 +92,13 @@
 Die im betrachteten Paper \cite{Mayr2003} beschreibene Methode wird in \cite{hobler2017hpm} schön zusammengefasst.
 
 \begin{itemize}
-	 \item Definition der Strahlungsinduzierten Fluidität $H = \frac 1 {\eta \dot{\phi}} = \frac 1 {\eta^{'}}$  ($\eta$ ... Viskosität, $\dot{\phi}$ ... 'flux', $\eta^{'}$ ... strahlungsind. Viskosität) \cite{Mayr2003}
+	 \item Definition der Strahlungsinduzierten Fluidität 
+	 	\begin{equation}
+	  		H = \frac 1 {\eta \dot{\phi}} = \frac 1 {\eta^{'}}
+		\end{equation}  
+		$\eta$ ... Viskosität\\
+		$\dot{\phi}$ ... 'flux'\\
+		$\eta^{'}$ ... strahlungsind. Viskosität \cite{Mayr2003}
 \end{itemize}
 
 
@@ -119,7 +127,7 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 
 \subsection{Reverse Non-Equlibirium MD  (rNEMD) Simulationen}
 	\begin{itemize}
-		 \item Zusammenfassende Beschreibung in \cite{Tenney2010} 
+		 \item Zusammenfassende Beschreibung in \cite{Tenney2010}:
 		  \item \textbf{Impulsfluss} wird vorgegeben und die \textbf{Schergeschwindigkeit} (Geschwindigkeitsprofil) wird gemessen.
 		  \item Vorteil: Schergeschwindigkeit ist leichter aus MD Simulationen zu ermitteln
 		  \item Simulationsbox wird in N kline Kästchen entlang der z-Achse eingeteilt
@@ -137,7 +145,9 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
   		   		 	\eta = \frac{-j_{xz} }{\dot{\gamma} },\quad j_{xz} = \frac{p_{\mathrm{total}}}{2 t L_x L_y},\quad p_{\mathrm{total} }= \sum (p_{x,n_c} - p_{x,n_1})
   		   		\end{equation}
   		   
-  		   $j_{xz}$ ... Eingeprägter Impulsfluss, $L_x,\,L_y$ ... Längen der Kästchen, $t$ ... Zeit\\
+  		   $j_{xz}$ ... Eingeprägter Impulsfluss\\
+  		   $L_x,\,L_y$ ... Längen der Kästchen\\
+  		   $t$ ... Zeit\\
   		   $\dot{\gamma} = \frac{\mathrm{d}v_x}{\mathrm{dz}}$ ergibt sich aus der Geschwindigkeitsverteilung
 		  
 		 \item Setup der LAMMPS MD Simulationen von \cite{Tenney2010} 
@@ -149,37 +159,94 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 		 			\item Simulationbox wird in 20 Kästchen entlang der z-Achse eingeteilt
 		 			\item Impulstausch zwischen erster und mittlerer Box
 		 			\item Tauschfrequenz: Nach jedem 1., 10., 100. Simulationszeitschritt
+		 			\item Gesamtzahl der Simulationschritte: $2e6$
 		 		\end{itemize}
 		 	
 		 
 		 
 		\begin{figure}[H]
 	    	\includegraphics[width=0.4\textwidth]{figs/rnemd_box}%
-	    	\caption{RNEMD simulation box \cite{Tenney2010}, Fig. 1.}
+	    	\caption{RNEMD Simulationsbox aus \cite{Tenney2010}, Fig. 1.}
    		\end{figure}		 
 		 
 	\end{itemize}
 
 
 
-\subsection{Autokorrelation des Drucktensors (Green-Kubo)}
-	\begin{itemize}
-		 \item Zusammenfassende Beschreibung \cite{Tenney2010}
-		 \item Mathematische Formulierung  \cite{Tenney2010} (in Abschnitt EMD, eher minimal gehalten), \cite{Kirova2015} (etwas ausführlicher)
-		 \item Bsp in LAMMPS verweist auf \cite{Daivis1994}
-	\end{itemize}
+\subsection{Gleichgewichts-MD Methoden (equilibrium MD, EMD)}
+Viskosität wird über Fluktuationen der \textbf{Nebendiagonalelemente des Spannungstensor} bestimmt. Die erhaltenen Wert gelten nur für \textbf{Newtonsche Fluide} ($\tau \propto \dot{\gamma}$). Prinzipiell sind die Ausdrücke nur im Grenzfall unendlich langer Simulationszeit und unendlich großer Simulationszelle gültig. Zusätzlich liegt typischerweise signifikantes thermisches Rauschen vor, was das SNR verringert. Daher ist eine große Zahl von Simulationsschritten nötig.\cite{Tenney2010}.
 
-\subsection{Einstein Formulierung der Green-Kubo Methode}
-	\begin{itemize}
-		 \item Zusammenfassende Beschreibung \cite{Tenney2010}
-		 \item Mathematische Formulierung  \cite{Tenney2010} (in Abschnitt EMD)
-	\end{itemize}
+	\subsubsection{Autokorrelation des Spannungstensors (Green-Kubo)}
+		\begin{itemize}
+			 \item Green-Kubo-Relationen (Primärquellen: \cite{Green1954,Kubo1957}, Sekundärquellne für Viskositäts-Formulierung: \cite{Kirova2015,Tenney2010})
+			 	\begin{equation}\label{eqn:green_kubo}
+			 		\eta = \beta V \int_0^\infty \langle P_{xz}(0) P_{xz}(t) \rangle \mathrm{d} t 
+				\end{equation}			 
+				
+				$\beta = 1/k_\mathrm{B} T$\\
+				$V$ ... Volumen der Simulationsbox\\
+				$P_{xz}$ ... xz-Komponente des Spannungstensors\\
+				$\langle \ldots \rangle$ ... Ensemble-Mittelwert
+			 
+		 	\item Viskosität wird damit aus der \textbf{Autokorrelationsfunktion} der xz-Komponente der Spannungstensors $P_{xz}$ bestimmt
+		 	\item xz-Komponente des Spannungstensors \cite{Kirova2015}
+		 		\begin{equation}
+					P_{xz} = \sum_{i=1}^N \frac{p_i^x p_i^z}{m_i} - \sum_{i>j}^N (x_i - x_j) \frac{\partial u_{ij} }{\partial z_j}	 	
+			 	\end{equation}
+			 	
+			 	$p_i^{x,z}$ ... Komponente des Impulses des i-ten Teilchens\\ 
+			 	$u_{ij}$ ... Interaktionspotential zwischen Teilchen j und Teilchen i\\
+			 	$m_i$ ... Masse des i-ten Teilchens\\
+			 	$x_i$ ... Ortsvektorkomponente von Teilchen i.
+			 	
+			\item Für \textbf{isotrope} Systeme existiert eine alternative Formulierung, die die Symmetrie ausnützt\cite{Tenney2010,Daivis1994}.
+				\begin{equation}
+					\eta = \frac{\beta V}{10} \int_0^\infty \langle P_{ij}^{os}(0) P_{ij}^{os}(t) \rangle \mathrm{d} t
+				\end{equation}
+			   
+			    $P_{ij}^{os}$ ist eine Komponente des spurfreien symmetrischen Anteils des Spannungstensors.
+			    \begin{equation}
+			    	P_{ij}^{os} = \frac{P_{ij} + P_{ji} }{2} - \delta_{ij} \frac 1 3 \sum_k P_{kk}
+			    \end{equation}
+			    
+    		 \item Setup der LAMMPS MD Simulationen von \cite{Kirova2015,Tenney2010} 
+		 		\begin{itemize}
+		 			\item 3D orthogonale Simulationsbox
+		 			\item Periodische RB
+		 			\item Verlet Zeitschrittverfahren
+		 			\item Equilibrisierung bei \SI{20}{K} mithilfe eines Berendesen Thermostats (kein Impulstausch findet statt)
+		 			\item Methode von \cite{Kirova2015}: MD Trajektorie wird in zeitliche Segmente eingeteilt und zeitliche Mittelung gemäß \refeqn{eqn:green_kubo} wird durch Ensemble-Mittelwert der einzelnen Segmente ersetzt.
+		 		\end{itemize}
+			 	
+		 	\item Bsp in LAMMPS verweist auf \cite{Daivis1994}
+		\end{itemize}
+
+	\subsubsection{Einstein Formulierung}
+		\begin{itemize}
+			 \item Viskosität wird über einen Grenzwert aus der Fluktuation des Spannungstensors ermittelt \cite{Tenney2010}
+			 
+			 	\begin{equation}
+					\eta = \lim_{t\to\infty} \frac{\beta V}{2 t} \left\langle \int_0^t P_{xz}(t')\mathrm{d}t' \right\rangle
+				\end{equation}
+				
+			 \item Kirova \cite{Kirova2015} verweist auf eine andere Formel, die bereits 1960 von Helfand \cite{Helfand1960} beschrieben wurde.
+			    \begin{equation}
+					\eta = \lim_{N,V,t\to\infty} \frac{\beta}{2 V t} \left\langle \left[\sum_{i=0}^N x_i(t) p_i^z(t) - \sum_{i=1}^N x_i(0) p_i^z(0) \right]^2 \right\rangle
+				\end{equation}
+				
+				Diese hat eine ähnliche Form wie die bekannte Einstein Relation für die Diffusionskonstante
+				\begin{equation}
+					D = \frac{1}{6t} \left\langle \left[ \sum_{i=0}^N r_i(t) - r_i(0) \right]^2 \right\rangle
+				\end{equation}
+			 
+			 \item Die prinzipielle Vorgangsweise bei der MD Simulation ist dieselbe wie bei der Green-Kubo-Methode.
+		\end{itemize}
 
 \section{Experimentelle Befunde}
 
 \subsection{Stress und Viskositätsbetrachtungen}
 	\begin{itemize}
-		\item Betrachtungen für $SiO_2$ in \cite{Snoeks2000}
+		\item Betrachtungen für $\mathrm{SiO_2}$ in \cite{Snoeks2000}
 	\end{itemize}
 
 
