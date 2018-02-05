@@ -126,13 +126,18 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 				\begin{itemize}
 					\item fix nvt/sllod ist eine normale NVT simulation mit einem Nose/Hoover Thermostat, bei dem die Temperatur aus der kinetischen Energie der Teilchen abzüglich jener die durch die Scherung (die positionsabhängige "Fließgeschwindigkeit" jedes Atoms wird von der Gesamtgeschwindigkeit abgezogen) berechnet wird.
 					\item fix deform verformt die Simulationsbox (zum Beispiel in xy Richtung mit konstanter Geschwindigkeit - siehe LAMMPS Beispiel in.nemd.2d)
-					\item Um die Gleichung \ref{equ:sllod} anzuwenden wird der resultierende Impulsfluss (aus fix nvt/sllod - Beispiel pxy) durch die Konstante Verschiebungsgeschwindigkeit (hier in x - Richung gesetzt mit fix deform) dividiert durch die Boxlänge (hier y Abmessung der Box) dividiert. 
+					\item Um die Gleichung \ref{equ:sllod} anzuwenden wird der resultierende Impulsfluss (aus fix ave/chunk für jeweils eine Ebene (definiert als Chunk) - Beispiel pxy) durch die Konstante Verschiebungsgeschwindigkeit (hier in x - Richung gesetzt mit fix deform) dividiert durch die Boxlänge (hier y Abmessung der Box) dividiert. 
 				\end{itemize}
 		\end{itemize}
 		
 	\subsubsection{Moving Walls}
 	    \begin{itemize}
-		 	\item LAMMPS: 'walls' werden definiert, eine ist ortfest, die zweite bewegt sich. Damit wird Scherung erreicht
+		 	\item Wie mit der SLLOD Methode wird hier eine Wandregion geschert und der Drucktensor (Impulsfluss).
+			\item LAMMPS: Definition der Wände mit region und group:
+			\begin{itemize}
+				\item Mithilfe des velocity Kommandos wird eine Wand verschoben und auf die beweglichen Atome anschließend thermostatisiert
+				\item Danach wird mit compute temp/ramp auf wieder auf die gewünschte Verschiebungsgeschwindigkeit (z.B. $v_x$) und die neue Simulationsboxgröße (z.B. $L_y$) equilibriert und wie bei SLLOD mit fix ave/Chunk die Drucktensorelemente für die definierten Schichten überwacht.
+			\end{itemize}
 		\end{itemize}
 
 \subsection{Reverse Non-Equlibirium MD  (rNEMD) Simulationen}
