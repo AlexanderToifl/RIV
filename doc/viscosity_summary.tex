@@ -114,10 +114,20 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 
 	\subsubsection{SLLOD}
 		\begin{itemize}
-		 	\item Original Paper, indem SLLOD Dynamik vorgestellt werden \cite{Evans1984}
-		 	\item Dem System wird eine Schergeschwindigkeit (shear rate) $\dot{\gamma}$ aufgezwungen. Als Folge ergibt sich ein Impulsfluss, der über die Nebendiagonalelemente des Spannungs- oder Drucktensors gemessen wird\cite{Tenney2010}.
+		 	\item Original Paper, indem SLLOD Dynamik vorgestellt werden \cite{Evans1984}, welche für alle homogenen Körper gilt.
+		 	\item Dem System wird eine Schergeschwindigkeit (shear rate) $\dot{\gamma}$ aufgezwungen. Als Folge ergibt sich ein Impulsfluss, der über die Nicht-Diagonalelemente des Spannungs- oder Drucktensors gemessen wird\cite{Tenney2010}. Die Scherviskosität ergibt sich damit zu 
+				\begin{equation}
+					\eta\left(\dot{\gamma}\right) = - \frac{P_{ij}}{\dot{\gamma}}
+					\label{equ:sllod}
+				\end{equation}
+ mit $P_{ij}$ den Nicht-Diagonalelementen des Stress - Tensors. i beschreibt die Flussrichtung und j die Normalrichtung darauf. 
 		 	\item Problem: Druck variiert typischerweise sehr stark in MD Simulationen, daher ist die Konvergenz eher langsam\cite{Tenney2010}.
-		 	\item LAMMPS: Simulationsbox wird geschert. Kombination von fix nvt/sllod und fix deform.
+		 	\item LAMMPS: Mit der Verwendung des fix nvt/sllod und fix deform 
+				\begin{itemize}
+					\item fix nvt/sllod ist eine normale NVT simulation mit einem Nose/Hoover Thermostat, bei dem die Temperatur aus der kinetischen Energie der Teilchen abzüglich jener die durch die Scherung (die positionsabhängige "Fließgeschwindigkeit" jedes Atoms wird von der Gesamtgeschwindigkeit abgezogen) berechnet wird.
+					\item fix deform verformt die Simulationsbox (zum Beispiel in xy Richtung mit konstanter Geschwindigkeit - siehe LAMMPS Beispiel in.nemd.2d)
+					\item Um die Gleichung \ref{equ:sllod} anzuwenden wird der resultierende Impulsfluss (aus fix nvt/sllod - Beispiel pxy) durch die Konstante Verschiebungsgeschwindigkeit (hier in x - Richung gesetzt mit fix deform) dividiert durch die Boxlänge (hier y Abmessung der Box) dividiert. 
+				\end{itemize}
 		\end{itemize}
 		
 	\subsubsection{Moving Walls}
