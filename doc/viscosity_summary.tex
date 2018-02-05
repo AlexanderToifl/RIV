@@ -240,7 +240,7 @@ Viskosität wird über Fluktuationen der \textbf{Nebendiagonalelemente des Spann
 				\end{equation}
 				
 			 \item Kirova \cite{Kirova2015} verweist auf eine andere Formel, die bereits 1960 von Helfand \cite{Helfand1960} beschrieben wurde.
-			    \begin{equation}
+			    \begin{equation}\label{eqn:Kirova}
 					\eta = \lim_{N,V,t\to\infty} \frac{\beta}{2 V t} \left\langle \left[\sum_{i=0}^N x_i(t) p_i^z(t) - \sum_{i=1}^N x_i(0) p_i^z(0) \right]^2 \right\rangle
 				\end{equation}
 				
@@ -248,6 +248,15 @@ Viskosität wird über Fluktuationen der \textbf{Nebendiagonalelemente des Spann
 				\begin{equation}
 					D = \frac{1}{6t} \left\langle \left[ \sum_{i=0}^N r_i(t) - r_i(0) \right]^2 \right\rangle
 				\end{equation}
+				
+			\item Helfand \cite{Helfand1960} beschreibt allgemein, dass für kanonische Systeme, deren Zeitentwicklung von einem definierten Anfangszustand betrachtet wird, ein Zusammenhang zwischen der Autokorrelationsformulierung und der Einstein'schen Form hergestellt werden kann. Unter gewissen Voraussetzungen gilt
+			
+				\begin{equation}
+					\langle (\Delta G)^2 \rangle = 2 t \int_0^\infty \langle J_0 J_\tau \rangle \mathrm{d} \tau,\quad J_\tau = \frac{ \mathrm{d} G }{\mathrm{d} \tau}
+				\end{equation}
+				
+				Die Einstein'sche Formulierung gemäß \refeqn{eqn:Kirova} sollte damit prinzipiell \textbf{äquivalent} mit der Green-Kubo-Formulierung sein.
+				
 			 
 			 \item Die prinzipielle Vorgangsweise bei der MD Simulation ist dieselbe wie bei der Green-Kubo-Methode.
 		\end{itemize}
