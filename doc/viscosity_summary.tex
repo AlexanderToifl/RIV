@@ -21,6 +21,7 @@
 \usepackage{lscape}
 \usepackage{siunitx}	
 %\usepackage{citesort} 
+\usepackage{physics}
 
 \usepackage[toc,page]{appendix}
 \setlength\parindent{0pt}
@@ -101,6 +102,33 @@ Die im betrachteten Paper \cite{Mayr2003} beschreibene Methode wird in \cite{hob
 		$\eta^{'}$ ... strahlungsind. Viskosität \cite{Mayr2003}
 \end{itemize}
 
+Um die strahlungsinduzierte Viskosität mit MD zu ermitteln wurde hier eine Konstante biaxiale Verzerrung aufgebracht (in 3D: $\varepsilon_{xx} = \varepsilon_{yy}$) und die Entwicklung der biaxialen Spannung beobachtet mit 
+
+\begin{equation}
+	\pdv{\sigma_{xx}}{n_{dpa}} + \frac{E_{bi}}{6\eta^{'}}\sigma_{xx} = 0
+\end{equation}
+
+mit 
+
+\begin{equation}
+	E_{bi} = \frac{1}{6G} + \frac{2}{9B} 
+\end{equation}
+
+Die Lösung 
+
+\begin{equation}
+	\sigma_{xx} = \sigma_{xx0} \mathrm{exp} \left( -\frac{E_{bi}}{6\eta^{'}} n_{dpa} \right) 
+	\label{eq:biax_stress}
+\end{equation}
+
+wurde hier auf die Simulationsergebnisse gefittet um $\eta^{'}$ zu extrahieren - sprich der "zeitliche" dpa Verlauf von $\sigma_{xx}$ auf die Formel \ref{eq:biax_stress} gefittet, wobei Recoils mit konstanter Energie eingebracht wurden. Die Anzahl der dadurch erzeugten Frenckel-Paare wird über das \textbf{Kinchin-Pease} Model abgeschätzt mit 
+
+\begin{equation}
+	n_{dpa} = \frac{E_R}{2.5 E_D}
+\end{equation}
+
+$E_R$ ... Recoil Energie
+$E_D$ ... Displacement Energie
 
 \section{MD Methoden zur Bestimmung der Viskosität}
 
