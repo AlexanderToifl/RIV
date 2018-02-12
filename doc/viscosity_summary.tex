@@ -90,45 +90,67 @@
 
 \section{Strahlungsinduzierte und dynamische Viskosität}
 
-Die im betrachteten Paper \cite{Mayr2003} beschreibene Methode wird in \cite{hobler2017hpm} schön zusammengefasst.
+\subsection{Definitionen und Begriffe}
+
+
 
 \begin{itemize}
-	 \item Definition der Strahlungsinduzierten Fluidität 
-	 	\begin{equation}
-	  		H = \frac 1 {\eta \dot{\phi}} = \frac 1 {\eta^{'}}
-		\end{equation}  
-		$\eta$ ... Viskosität\\
+	\item Definition der dynamischen Viskosität
+	
+	      \begin{equation}
+		  \eta = \frac{\tau }{\dot{\gamma} }
+	      \end{equation}
+	      $\tau$ ... Schubspannung
+	      $\dot{\gamma} $ ... Geschwindigkeitsprofil senkrecht zur Bewegungsrichtung
+	
+	\item Definition der Strahlungsinduzierten Fluidität 
+	      \begin{equation}
+		    H = \frac 1 {\eta \dot{\phi}} = \frac 1 {\eta^{'}}
+	      \end{equation}  
+		$\eta$ ... dynamische Viskosität\\
 		$\dot{\phi}$ ... 'flux'\\
 		$\eta^{'}$ ... strahlungsind. Viskosität \cite{Mayr2003}
+		
+	
 \end{itemize}
 
-Um die strahlungsinduzierte Viskosität mit MD zu ermitteln wurde hier eine Konstante biaxiale Verzerrung aufgebracht (in 3D: $\varepsilon_{xx} = \varepsilon_{yy}$) und die Entwicklung der biaxialen Spannung beobachtet mit 
 
-\begin{equation}
-	\pdv{\sigma_{xx}}{n_{dpa}} + \frac{E_{bi}}{6\eta^{'}}\sigma_{xx} = 0
-\end{equation}
+\subsection{Bestimmung der strahlungsinduzierten Viskosität mittels Molekulardynamik Simulationen}
 
-mit 
+\begin{itemize}
 
-\begin{equation}
-	E_{bi} = \frac{1}{6G} + \frac{2}{9B} 
-\end{equation}
+  \item Strahlungsinduzierten Fluidität wird mittels Molekulardynamik (MD) in \cite{Mayr2003} berechnet. 
+  \item Zusammenfassung in in \cite{hobler2017hpm}.
+  
+  \item Eine konstante biaxiale Verzerrung wurd aufgebracht (in 3D: $\varepsilon_{xx} = \varepsilon_{yy}$) und die Entwicklung der biaxialen Spannung beobachtet mit 
 
-Die Lösung 
+    \begin{equation}
+	    \pdv{\sigma_{xx}}{n_{dpa}} + \frac{E_{bi}}{6\eta^{'}}\sigma_{xx} = 0
+    \end{equation}
 
-\begin{equation}
-	\sigma_{xx} = \sigma_{xx0} \mathrm{exp} \left( -\frac{E_{bi}}{6\eta^{'}} n_{dpa} \right) 
-	\label{eq:biax_stress}
-\end{equation}
+    mit 
 
-wurde hier auf die Simulationsergebnisse gefittet um $\eta^{'}$ zu extrahieren - sprich der "zeitliche" dpa Verlauf von $\sigma_{xx}$ auf die Formel \ref{eq:biax_stress} gefittet, wobei Recoils mit konstanter Energie eingebracht wurden. Die Anzahl der dadurch erzeugten Frenckel-Paare wird über das \textbf{Kinchin-Pease} Model abgeschätzt mit 
+    \begin{equation}
+	    E_{bi} = \frac{1}{6G} + \frac{2}{9B} 
+    \end{equation}
 
-\begin{equation}
-	n_{dpa} = \frac{E_R}{2.5 E_D}
-\end{equation}
+    Die Lösung 
 
-$E_R$ ... Recoil Energie
-$E_D$ ... Displacement Energie
+    \begin{equation}
+	    \sigma_{xx} = \sigma_{xx0} \mathrm{exp} \left( -\frac{E_{bi}}{6\eta^{'}} n_{dpa} \right) 
+	    \label{eq:biax_stress}
+    \end{equation}
+
+    wurde hier auf die Simulationsergebnisse gefittet um $\eta^{'}$ zu extrahieren - sprich der "zeitliche" dpa Verlauf von $\sigma_{xx}$ auf die Formel \ref{eq:biax_stress} gefittet, wobei Recoils mit konstanter Energie eingebracht wurden. Die Anzahl der dadurch erzeugten Frenckel-Paare wird über das \textbf{Kinchin-Pease} Model abgeschätzt mit 
+
+    \begin{equation}
+	    n_{dpa} = \frac{E_R}{2.5 E_D}
+    \end{equation}
+
+    $E_R$ ... Recoil Energie
+    $E_D$ ... Displacement Energie
+    
+\end{itemize}
 
 \section{MD Methoden zur Bestimmung der Viskosität}
 
@@ -142,7 +164,7 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 
 	\subsubsection{SLLOD}
 		\begin{itemize}
-		 	\item Original Paper, indem SLLOD Dynamik vorgestellt werden \cite{Evans1984}, welche für alle homogenen Körper gilt.
+		 	\item Original Paper, in dem SLLOD Dynamik vorgestellt werden \cite{Evans1984}, welche für alle homogenen Körper gilt.
 		 	\item Dem System wird eine Schergeschwindigkeit (shear rate) $\dot{\gamma}$ aufgezwungen. Als Folge ergibt sich ein Impulsfluss, der über die Nicht-Diagonalelemente des Spannungs- oder Drucktensors gemessen wird\cite{Tenney2010}. Die Scherviskosität ergibt sich damit zu 
 				\begin{equation}
 					\eta\left(\dot{\gamma}\right) = - \frac{P_{ij}}{\dot{\gamma}}
@@ -173,10 +195,10 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 		 \item Zusammenfassende Beschreibung in \cite{Tenney2010}:
 		  \item \textbf{Impulsfluss} wird vorgegeben und die \textbf{Schergeschwindigkeit} (Geschwindigkeitsprofil) wird gemessen.
 		  \item Vorteil: Schergeschwindigkeit ist leichter aus MD Simulationen zu ermitteln
-		  \item Simulationsbox wird in N kline Kästchen entlang der z-Achse eingeteilt
-		  \item Vorgabe der Schergeschwindigkeit: \textbf{Periodischer} Tausch von Momenten (momenta swaps) 
+		  \item Simulationsbox wird in N kleine Kästchen entlang der z-Achse eingeteilt
+		  \item Vorgabe der Schergeschwindigkeit: \textbf{Periodischer} Tausch von Impulsen (momenta swaps) 
 		  		\begin{itemize}
-			  		\item Ursprüngliche Implementierung: x-Komponente des Impulses des Atoms mit der negativsten Impulskompentente in Kästchen 1 $p_{x,n_1}$ wird mit der x-Komplente des Atomes mit der positivsten Impulskomponente im Kästchen $n = n_c = N/2 + 1$, $p_{x,n_c}$ getauscht.
+			  		\item Ursprüngliche Implementierung: x-Komponente des Impulses des Atoms mit der negativsten Impulskompentente in Kästchen 1 $p_{x,n_1}$ wird mit der x-Komponente des Atomes mit der positivsten Impulskomponente im Kästchen $n = n_c = N/2 + 1$, $p_{x,n_c}$ getauscht.
 			  		\item Lammps-Implementierung: Eine Zielgeschwindigkeit $\pm v_{x,t}$ wird definiert. Impuls der beiden Atome, die jeweils am knappsten am positiven/negativen Wert liegt, wird getauscht.
 		  		\end{itemize}
 		  \item Da Gesamtimpuls und kinetische Energie erhalten bleiben, ist prinzipiell kein Thermostat nötig
@@ -217,7 +239,7 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 
 
 \subsection{Gleichgewichts-MD Methoden (equilibrium MD, EMD)}
-Viskosität wird über Fluktuationen der \textbf{Nebendiagonalelemente des Spannungstensor} bestimmt. Die erhaltenen Wert gelten nur für \textbf{Newtonsche Fluide} ($\tau \propto \dot{\gamma}$). Prinzipiell sind die Ausdrücke nur im Grenzfall unendlich langer Simulationszeit und unendlich großer Simulationszelle gültig. Zusätzlich liegt typischerweise signifikantes thermisches Rauschen vor, was das SNR verringert. Daher ist eine große Zahl von Simulationsschritten nötig.\cite{Tenney2010}.
+Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelementen des Spannungstensor} bestimmt. Die erhaltenen Wert gelten nur für \textbf{Newtonsche Fluide} ($\tau \propto \dot{\gamma}$). Prinzipiell sind die Ausdrücke nur im Grenzfall unendlich langer Simulationszeit und unendlich großer Simulationszelle gültig. Zusätzlich liegt typischerweise signifikantes thermisches Rauschen vor, was das SNR verringert. Daher ist eine große Zahl von Simulationsschritten nötig.\cite{Tenney2010}.
 
 	\subsubsection{Autokorrelation des Spannungstensors (Green-Kubo)}
 		\begin{itemize}
