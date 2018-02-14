@@ -16,7 +16,7 @@
 \usepackage{amssymb}
 \usepackage[font={footnotesize}, bf]{caption}
 \renewcommand{\arraystretch}{1.2}
-
+\usepackage{bm}
 \usepackage{longtable}
 \usepackage{lscape}
 \usepackage{siunitx}	
@@ -58,8 +58,8 @@
 \newcolumntype{"}{@{\hskip\tabcolsep\vrule width 1pt\hskip\tabcolsep}}
 \makeatother
 
-\newcommand{\refeqn}[1]  {Glg.~\ref{#1}}  
-
+\newcommand{\refeqn}[1]  {Gleichung~\ref{#1}}  
+\newcommand{\refsec}[1]  {Abschnitt~\ref{#1}}  
 %\usepackage{fancyhdr}
 %\pagestyle{fancy}
 %\fancyhf{}
@@ -100,16 +100,47 @@
 	      \begin{equation}
 		  \eta = \frac{\tau }{\dot{\gamma} }
 	      \end{equation}
-	      $\tau$ ... Schubspannung
-	      $\dot{\gamma} $ ... Geschwindigkeitsprofil senkrecht zur Bewegungsrichtung
+	      $\tau$ ... Schubspannung\\
+	      $\dot{\gamma} $ ... Geschwindigkeitsprofil senkrecht zur Richtung in der die Schubspannung wirkt
+
+	\item Grundidee der strahlungsinduzierten Viskosität \cite{hobler2017hpm}
 	
-	\item Definition der Strahlungsinduzierten Fluidität 
-	      \begin{equation}
-		    H = \frac 1 {\eta \dot{\phi}} = \frac 1 {\eta^{'}}
+		\begin{itemize}
+			
+			\item Ionenbeschuss des Targets mit bestimmter Dosis führt zur Verschiebung von Atomen (displacement).
+			\item Wenn die Dosis zeitlich variiert wird mit einer gewissen Dosisrate $\dot \phi$, ergibt ein zeitlicher Verlauf der Anzahl der Displacements.
+			\item Folglich ergibt sich ein ortsabhängiger Nettofluss von Atomen, die zu einem veränderten Geschwindigkeitsprofil führt.
+			
+			\item Daher hängt die dynamische Viskosität $\eta$ von der Energiedeposition in Form der Displacements ab (orts- und dosisratenabhängig: $\eta = \eta(\bm{x}, \dot{\phi})$).
+			
+			\item Unter der Annahme, dass die Spannungs-Relaxation als Antwort auf eine (bspw. biaxiale) Verzerrung \textbf{nur von den Displacments} herrührt (\textit{Ist diese Annahme gerechtfertigt?}), gibt es eine orts- und dosisraten\textbf{un}abhängige Größe, die das viskose Verhalten des gesamten Targets beschreibt - die strahlungsbezogene Viskosität $\eta^{'}$.
+			\begin{equation}
+		  		\frac{\partial \bm{\varepsilon}}{\partial n_\mathrm{dpa} } = \frac{1}{2G} \frac{\partial \bm{\sigma}}{\partial n_\mathrm{dpa}} + \frac{1}{2 \eta^{'} }\bm \sigma
+	      	\end{equation}
+	      	
+	      	$ \bm{\varepsilon}$ ... Verzerrungstensor\\
+	      	$\bm\sigma$ ... Spannungstensor\\
+	      	$G$ ... Schubspannungsmodul
+			
+					     
+		\end{itemize}
+	
+	\item Definition der Strahlungsinduzierten Fluidität $H$ nach \cite{Mayr2003}
+	      \begin{equation}\label{eqn:visc_mayer}
+		    H = \frac 1 {\eta \dot{\phi}} = \frac 1 {\eta^{'}}\, \implies \quad \eta^{'} = \eta \dot{\phi}
 	      \end{equation}  
 		$\eta$ ... dynamische Viskosität\\
-		$\dot{\phi}$ ... 'flux'\\
-		$\eta^{'}$ ... strahlungsind. Viskosität \cite{Mayr2003}
+		$\eta^{'}$ ... strahlungsind. Viskosität 
+		
+	\item Beziehung zwischen dynamischer und strahlungsinduzierter Viskosität nach nach \cite{hobler2017hpm}
+	      \begin{equation}\label{eqn:visc_hobler}
+		    \eta^{'} = \eta \frac{\partial n_\mathrm{dpa}}{\partial t} = \eta \frac{\partial n_\mathrm{dpa}}{\partial \phi} \dot{\phi}
+	      \end{equation} 
+		$ n_\mathrm{dpa}$ ... Anzahl der Displacments \\
+		$\phi$ ... Implantationsdosis\\
+		$\dot{\phi}$ ... Implantationsdosisrate\newline
+		\textit{Wie lässt sich die Diskrepanz zwischen \refeqn{eqn:visc_mayer} und \refeqn{eqn:visc_hobler} erklären? Nehmen Mayr et al. einen linearen Zusammenhang der Form $n_\mathrm{dpa}(\phi) = k \phi$ an?}
+		
 		
 	
 \end{itemize}
@@ -119,43 +150,28 @@
 
 \begin{itemize}
 
-  \item Strahlungsinduzierten Fluidität wird mittels Molekulardynamik (MD) in \cite{Mayr2003} berechnet. 
-  \item Zusammenfassung in in \cite{hobler2017hpm}.
-  
-  \item Eine konstante biaxiale Verzerrung wurd aufgebracht (in 3D: $\varepsilon_{xx} = \varepsilon_{yy}$) und die Entwicklung der biaxialen Spannung beobachtet mit 
+   \item \textit{Setup der MD Simulation (Amorphisierung, Equilibrierung, ...)}
+   
+	\begin{itemize}
+	   \item Allgemeine Informationen zum Aufschmelzen und Abkühlen (Temperatur und Druck) mit MD - Simulationen (in Ge - Dünnschichten) zur Amorphisierung des Materials finden sich in \cite{Mayr2005}. 
+	   
+	   \item Außerdem werden auch Werte für die strahlungsinduzierte Viskosität in Abhängigkeit der Defektdichte dpa angegeben (Methode?). 
 
-    \begin{equation}
-	    \pdv{\sigma_{xx}}{n_{dpa}} + \frac{E_{bi}}{6\eta^{'}}\sigma_{xx} = 0
-    \end{equation}
+	   \item Ebenfalls wird dies in \cite{Edler2007} beschrieben, wobei hier aber nur mech. Stressbetrachtungen gemacht werden. 
+	   
+	   \item In \cite{Lehnert2017} wird die in \cite{Mayr2003} erwähnte Methode auf a-Ge-Si Legierungen angewandt um mithilfe der Fluidität die Formierung von porösen Strukturen zu begründen.
+	   
+	\end{itemize}	   
+   
+   \item \textit{Wie werden Recoils eingebracht? Künstlich wie in \cite{Mayr2003}? Oder durch Ionendeposition wie beim Sputtern?}
+   \item \textit{Wie können die Standardmethoden zur Berechnung der Viskosität von Flüssigkeiten (\refsec{sec:visc}) so abgewandelt werden, dass sich die strahlungsinduzierte Viskosität ergibt?}
+   
+ 
 
-    mit 
-
-    \begin{equation}
-	    E_{bi} = \frac{1}{6G} + \frac{2}{9B} 
-    \end{equation}
-
-    Die Lösung 
-
-    \begin{equation}
-	    \sigma_{xx} = \sigma_{xx0} \mathrm{exp} \left( -\frac{E_{bi}}{6\eta^{'}} n_{dpa} \right) 
-	    \label{eq:biax_stress}
-    \end{equation}
-
-    wurde hier auf die Simulationsergebnisse gefittet um $\eta^{'}$ zu extrahieren - sprich der "zeitliche" dpa Verlauf von $\sigma_{xx}$ auf die Formel \ref{eq:biax_stress} gefittet, wobei Recoils mit konstanter Energie eingebracht wurden. Die Anzahl der dadurch erzeugten Frenckel-Paare wird über das \textbf{Kinchin-Pease} Model abgeschätzt mit 
-
-    \begin{equation}
-	    n_{dpa} = \frac{E_R}{2.5 E_D}
-    \end{equation}
-
-    $E_R$ ... Recoil Energie
-    $E_D$ ... Displacement Energie
-    
 \end{itemize}
 
-\section{MD Methoden zur Bestimmung der Viskosität}
 
-Allgemeine Informationen zum Aufschmelzen und Abkühlen (Temperatur und Druck) mit MD - Simulationen (in Ge - Dünnschichten) zur Amorphisierung des Materials finden sich in \cite{Mayr2005}. Außerdem werden auch Werte für die strahlungsinduzierte Viskosität in Abhängigkeit der Defektdichte dpa angegeben (Methode?). Ebenfalls wird dies in \cite{Edler2007} beschrieben, wobei hier aber nur mech. Stressbetrachtungen gemacht werden. In \cite{Lehnert2017} wird die in \cite{Mayr2003} erwähnte Methode auf a-Ge-Si Legierungen angewandt um mithilfe der Fluidität die Formierung von porösen Strukturen zu begründen.
-
+\section{MD Methoden zur Bestimmung der Viskosität}\label{sec:visc}
 
 \subsection{Non-equilibrium MD (NEMD) Simulationen}
 
@@ -174,7 +190,7 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 		 	\item Problem: Druck variiert typischerweise sehr stark in MD Simulationen, daher ist die Konvergenz eher langsam\cite{Tenney2010}.
 		 	\item LAMMPS: Mit der Verwendung des fix nvt/sllod und fix deform 
 				\begin{itemize}
-					\item fix nvt/sllod ist eine normale NVT simulation mit einem Nose/Hoover Thermostat, bei dem die Temperatur aus der kinetischen Energie der Teilchen abzüglich jener die durch die Scherung (die positionsabhängige "Fließgeschwindigkeit" jedes Atoms wird von der Gesamtgeschwindigkeit abgezogen) berechnet wird.
+					\item fix nvt/sllod ist eine normale NVT simulation mit einem Nose/Hoover Thermostat, bei dem die Temperatur aus der kinetischen Energie der Teilchen abzüglich jener die durch die Scherung (die positionsabhängige 'Fließgeschwindigkeit' jedes Atoms wird von der Gesamtgeschwindigkeit abgezogen) berechnet wird.
 					\item fix deform verformt die Simulationsbox (zum Beispiel in xy Richtung mit konstanter Geschwindigkeit - siehe LAMMPS Beispiel in.nemd.2d)
 					\item Um die Gleichung \ref{equ:sllod} anzuwenden wird der resultierende Impulsfluss (aus fix ave/chunk für jeweils eine Ebene (definiert als Chunk) - Beispiel pxy) durch die Konstante Verschiebungsgeschwindigkeit (hier in x - Richung gesetzt mit fix deform) dividiert durch die Boxlänge (hier y Abmessung der Box) dividiert. 
 				\end{itemize}
@@ -182,21 +198,59 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 		
 	\subsubsection{Moving Walls}
 	    \begin{itemize}
-		 	\item Wie mit der SLLOD Methode wird hier eine Wandregion geschert und der Drucktensor (Impulsfluss).
+		 	\item Wie mit der SLLOD Methode wird hier eine Wandregion geschert und der Drucktensor (Impulsfluss) berechnet.
 			\item LAMMPS: Definition der Wände mit region und group:
 			\begin{itemize}
 				\item Mithilfe des velocity Kommandos wird eine Wand verschoben und auf die beweglichen Atome anschließend thermostatisiert
 				\item Danach wird mit compute temp/ramp auf wieder auf die gewünschte Verschiebungsgeschwindigkeit (z.B. $v_x$) und die neue Simulationsboxgröße (z.B. $L_y$) equilibriert und wie bei SLLOD mit fix ave/Chunk die Drucktensorelemente für die definierten Schichten überwacht.
 			\end{itemize}
 		\end{itemize}
+		
+	\subsubsection{Abwandlung für die strahlungsinduzierte Viskosität}
+	\begin{itemize}
+
+ 		 \item Strahlungsinduzierten Fluidität wird mittels Molekulardynamik (MD) in \cite{Mayr2003} berechnet. 
+  		 \item Zusammenfassung in in \cite{hobler2017hpm}.
+  
+  		  \item Eine konstante biaxiale Verzerrung wurd aufgebracht (in 3D: $\varepsilon_{xx} = \varepsilon_{yy}$) und die Entwicklung der biaxialen Spannung beobachtet mit 
+
+   		 	\begin{equation}
+	    		\pdv{\sigma_{xx}}{n_{dpa}} + \frac{E_{bi}}{6\eta^{'}}\sigma_{xx} = 0
+    		\end{equation}
+
+    		mit 
+
+    		\begin{equation}
+	   		 	E_{bi} = \frac{1}{6G} + \frac{2}{9B} 
+    		\end{equation}
+
+   			 Die Lösung 
+
+    		\begin{equation}\label{eqn:biax_stress}
+	    		\sigma_{xx} = \sigma_{xx0} \mathrm{exp} \left( -\frac{E_{bi}}{6\eta^{'}} n_{dpa} \right) 
+    		\end{equation}
+
+   			 wurde hier auf die Simulationsergebnisse gefittet um $\eta^{'}$ zu extrahieren - sprich der 'zeitliche' dpa Verlauf von $\sigma_{xx}$ auf die Formel \ref{eqn:biax_stress} gefittet, wobei Recoils mit konstanter Energie eingebracht wurden. Die Anzahl der dadurch erzeugten Frenckel-Paare wird über das \textbf{Kinchin-Pease} Model abgeschätzt mit 
+
+   			 \begin{equation}
+	   		 	n_{dpa} = \frac{E_R}{2.5 E_D}
+   			 \end{equation}
+
+    		$E_R$ ... Recoil Energie\\
+   			 $E_D$ ... Displacement Energie
+    
+    \end{itemize}
+    
 
 \subsection{Reverse Non-Equlibirium MD  (rNEMD) Simulationen}
+
+\subsubsection{Dynamische Viskosität}
 	\begin{itemize}
 		 \item Zusammenfassende Beschreibung in \cite{Tenney2010}:
 		  \item \textbf{Impulsfluss} wird vorgegeben und die \textbf{Schergeschwindigkeit} (Geschwindigkeitsprofil) wird gemessen.
 		  \item Vorteil: Schergeschwindigkeit ist leichter aus MD Simulationen zu ermitteln
 		  \item Simulationsbox wird in N kleine Kästchen entlang der z-Achse eingeteilt
-		  \item Vorgabe der Schergeschwindigkeit: \textbf{Periodischer} Tausch von Impulsen (momenta swaps) 
+		  \item Vorgabe des Impulsflusses: \textbf{Periodischer} Tausch von Impulsen (momenta swaps) 
 		  		\begin{itemize}
 			  		\item Ursprüngliche Implementierung: x-Komponente des Impulses des Atoms mit der negativsten Impulskompentente in Kästchen 1 $p_{x,n_1}$ wird mit der x-Komponente des Atomes mit der positivsten Impulskomponente im Kästchen $n = n_c = N/2 + 1$, $p_{x,n_c}$ getauscht.
 			  		\item Lammps-Implementierung: Eine Zielgeschwindigkeit $\pm v_{x,t}$ wird definiert. Impuls der beiden Atome, die jeweils am knappsten am positiven/negativen Wert liegt, wird getauscht.
@@ -235,11 +289,15 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
    		\end{figure}		 
 		 
 	\end{itemize}
+	
+	\subsubsection{Strahlungsinduzierte Viskosität}
+	
+	\textit{Kann man mit rNEMD auch die Relaxation in Abhängigkeit von der Anzahl der Displacements betrachten? Möglicherweise durch Lösen der viskoelastischen Materialgleichung für eingeprägte Schubspannung.}
 
 
 
 \subsection{Gleichgewichts-MD Methoden (equilibrium MD, EMD)}
-Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelementen des Spannungstensor} bestimmt. Die erhaltenen Wert gelten nur für \textbf{Newtonsche Fluide} ($\tau \propto \dot{\gamma}$). Prinzipiell sind die Ausdrücke nur im Grenzfall unendlich langer Simulationszeit und unendlich großer Simulationszelle gültig. Zusätzlich liegt typischerweise signifikantes thermisches Rauschen vor, was das SNR verringert. Daher ist eine große Zahl von Simulationsschritten nötig.\cite{Tenney2010}.
+Dynamische Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelementen des Spannungstensor} bestimmt. Die erhaltenen Wert gelten nur für \textbf{Newtonsche Fluide} ($\tau \propto \dot{\gamma}$). Prinzipiell sind die Ausdrücke nur im Grenzfall unendlich langer Simulationszeit und unendlich großer Simulationszelle gültig. Zusätzlich liegt typischerweise signifikantes thermisches Rauschen vor, was das SNR verringert. Daher ist eine große Zahl von Simulationsschritten nötig.\cite{Tenney2010}.
 
 	\subsubsection{Autokorrelation des Spannungstensors (Green-Kubo)}
 		\begin{itemize}
@@ -290,7 +348,7 @@ Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelementen des Spa
 		\begin{itemize}
 			 \item Viskosität wird über einen Grenzwert aus der Fluktuation des Spannungstensors ermittelt \cite{Tenney2010}
 			 
-			 	\begin{equation}
+			 	\begin{equation}\label{eqn:tenney}
 					\eta = \lim_{t\to\infty} \frac{\beta V}{2 t} \left\langle \int_0^t P_{xz}(t')\mathrm{d}t' \right\rangle
 				\end{equation}
 				
@@ -310,17 +368,21 @@ Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelementen des Spa
 					\langle (\Delta G)^2 \rangle = 2 t \int_0^\infty \langle J_0 J_\tau \rangle \mathrm{d} \tau,\quad J_\tau = \frac{ \mathrm{d} G }{\mathrm{d} \tau}
 				\end{equation}
 				
-				Die Einstein'sche Formulierung gemäß \refeqn{eqn:Kirova} sollte damit prinzipiell \textbf{äquivalent} mit der Green-Kubo-Formulierung sein.
+				Die Einstein'sche Formulierung gemäß \refeqn{eqn:Kirova} sollte damit prinzipiell \textbf{äquivalent} mit der Green-Kubo-Formulierung sein. \textit{Kann die Formulierung nach \refeqn{eqn:tenney} überhaupt stimmen?}
 				
 			 
 			 \item Die prinzipielle Vorgangsweise bei der MD Simulation ist dieselbe wie bei der Green-Kubo-Methode.
 		\end{itemize}
+
+	\subsubsection{Abwandlung für die strahlungsinduzierte Viskosität}
+	\textit{Ist es prinzipiell möglich mit Gleichgewichtsmethoden auf die strahlungsinduzierte Viskosität zu schließen?}
 
 \section{Experimentelle Befunde}
 
 \subsection{Stress und Viskositätsbetrachtungen}
 	\begin{itemize}
 		\item Betrachtungen für $\mathrm{SiO_2}$ in \cite{Snoeks2000}
+		\item \textit{Wird der Begriff der strahlungsinduzierten Viskosität auch in der experimentellen Literatur verwendet?}
 	\end{itemize}
 
 
