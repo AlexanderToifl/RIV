@@ -164,7 +164,7 @@
 	\end{itemize}	   
    
    \item \textit{Wie werden Recoils eingebracht? Künstlich wie in \cite{Mayr2003}? Oder durch Ionendeposition wie beim Sputtern?}\\
-In \cite{Mayr2005} wird einfach eine zufällig orientierte Geschwindigkeit (entspricht der gewünschen Recoil-Energie) zufällig ausgewählten Atomen zugewiesen. Dabei werden unterschiedliche Randbedingungen verwendet (periodisch in alle Richtungen, periodisch in x,y und offen in z) um den Einfluss von Oberflächeneffekten zu berücksichtigen. Die 3 äußeren Lagen der Simulationsbox wurden Temperaturgeregelt und pro eV kinetischer Energie wurden 25 Atome simuliert um unerwünschtes Aufheizen zu vermeiden. 
+In \cite{Mayr2005} wird eine zufällig orientierte Geschwindigkeit (entspricht der gewünschen Recoil-Energie) zufällig ausgewählten Atomen zugewiesen. Dabei werden unterschiedliche Randbedingungen verwendet (periodisch in alle Richtungen, periodisch in x,y und offen in z) um den Einfluss von Oberflächeneffekten zu berücksichtigen. Die 3 äußeren Lagen der Simulationsbox werden Temperatur-geregelt und pro eV kinetischer Energie werden 25 Atome simuliert um unerwünschtes Aufheizen zu vermeiden. 
 
    \item \textit{Wie können die Standardmethoden zur Berechnung der Viskosität von Flüssigkeiten (\refsec{sec:visc}) so abgewandelt werden, dass sich die strahlungsinduzierte Viskosität ergibt?}
    
@@ -194,7 +194,7 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 				\begin{itemize}
 					\item \texttt{fix nvt/sllod} startet eine NVT-Simulation mit einem Nose/Hoover Thermostat. Die Temperatur wird dabei aus der kinetischen Energie der Teilchen abzüglich der von der Scherung herrührenden kinetischen Energie berechnet. (die positionsabhängige 'Fließgeschwindigkeit' jedes Atoms wird von der Gesamtgeschwindigkeit abgezogen)
 					\item \texttt{fix deform} verformt die Simulationsbox (zum Beispiel in xy-Richtung mit konstanter Rate - siehe LAMMPS Beispiel in.nemd.2d)
-					\item Um die Gleichung \ref{equ:sllod} anzuwenden, wird das Geschwindigkeitsprofil $v_x$ (mit \texttt{fix ave/chunk} für jeweils eine Ebene (definiert als Chunk)) ermittelt. Die sich durch die Verformung einstellende Impulsfluss (im Beispiel $p_{xy}$) wird durch die mittlere Geschwindigkeit $v_x$ dividiert durch die Boxlänge $l_y$ dividiert.
+					\item Um die Gleichung \ref{equ:sllod} anzuwenden, wird das Geschwindigkeitsprofil $v_x$ (mit \texttt{fix ave/chunk} für jeweils eine Ebene (definiert als Chunk)) ermittelt. Der sich durch die Verformung einstellende Impulsfluss (im Beispiel $p_{xy}$) wird durch die mittlere Geschwindigkeit $v_x$ und durch die Boxlänge $l_y$ dividiert.
 				\end{itemize}
 		\end{itemize}
 		
@@ -305,7 +305,7 @@ Dynamische Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelemen
 
 	\subsubsection{Autokorrelation des Spannungstensors (Green-Kubo)}
 		\begin{itemize}
-			 \item Green-Kubo-Relationen (Primärquellen: \cite{Green1954,Kubo1957}, Sekundärquellne für Viskositäts-Formulierung: \cite{Kirova2015,Tenney2010})
+			 \item Green-Kubo-Relationen (Primärquellen: \cite{Green1954,Kubo1957}, Sekundärquellen für Viskositäts-Formulierung: \cite{Kirova2015,Tenney2010})
 			 	\begin{equation}\label{eqn:green_kubo}
 			 		\eta = \beta V \int_0^\infty \langle P_{xz}(0) P_{xz}(t) \rangle \mathrm{d} t 
 				\end{equation}			 
@@ -315,7 +315,7 @@ Dynamische Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelemen
 				$P_{xz}$ ... xz-Komponente des Spannungstensors\\
 				$\langle \ldots \rangle$ ... Ensemble-Mittelwert
 			 
-		 	\item Viskosität wird damit aus der \textbf{Autokorrelationsfunktion} der xz-Komponente der Spannungstensors $P_{xz}$ bestimmt
+		 	\item Viskosität wird damit aus der \textbf{Autokorrelationsfunktion} der xz-Komponente des Spannungstensors $P_{xz}$ bestimmt
 		 	\item xz-Komponente des Spannungstensors \cite{Kirova2015}
 		 		\begin{equation}
 					P_{xz} = \sum_{i=1}^N \frac{p_i^x p_i^z}{m_i} - \sum_{i>j}^N (x_i - x_j) \frac{\partial u_{ij} }{\partial z_j}	 	
@@ -366,7 +366,7 @@ Dynamische Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelemen
 					D = \frac{1}{6t} \left\langle \left[ \sum_{i=0}^N r_i(t) - r_i(0) \right]^2 \right\rangle
 				\end{equation}
 				
-			\item Helfand \cite{Helfand1960} beschreibt allgemein, dass für kanonische Systeme, deren Zeitentwicklung von einem definierten Anfangszustand betrachtet wird, ein Zusammenhang zwischen der Autokorrelationsformulierung und der Einstein'schen Form hergestellt werden kann. Unter gewissen Voraussetzungen gilt
+			\item Helfand \cite{Helfand1960} beschreibt allgemein, dass für kanonische Systeme, deren Zeitentwicklung von einem definierten Anfangszustand heraus betrachtet wird, ein Zusammenhang zwischen der Autokorrelationsformulierung und der Einstein'schen Form hergestellt werden kann. Unter gewissen Voraussetzungen (siehe  \cite{Helfand1960})  gilt
 			
 				\begin{equation}
 					\langle (\Delta G)^2 \rangle = 2 t \int_0^\infty \langle J_0 J_\tau \rangle \mathrm{d} \tau,\quad J_\tau = \frac{ \mathrm{d} G }{\mathrm{d} \tau}
