@@ -108,7 +108,7 @@
 		\begin{itemize}
 			
 			\item Ionenbeschuss des Targets mit bestimmter Dosis führt zur Verschiebung von Atomen (displacement).
-			\item Wenn die Dosis zeitlich variiert wird mit einer gewissen Dosisrate $\dot \phi$, ergibt ein zeitlicher Verlauf der Anzahl der Displacements.
+			\item Wenn die Dosis zeitlich variiert wird mit einer gewissen Dosisrate $\dot \phi$, ergibt sich ein zeitlicher Verlauf der Anzahl der Displacements $n_\mathrm{dpa}(t)$.
 			\item Folglich ergibt sich ein ortsabhängiger Nettofluss von Atomen, die zu einem veränderten Geschwindigkeitsprofil führt.
 			
 			\item Daher hängt die dynamische Viskosität $\eta$ von der Energiedeposition in Form der Displacements ab (orts- und dosisratenabhängig: $\eta = \eta(\bm{x}, \dot{\phi})$).
@@ -129,8 +129,8 @@
 	      \begin{equation}\label{eqn:visc_mayer}
 		    H = \frac 1 {\eta \dot{\phi}} = \frac 1 {\eta^{'}}\, \implies \quad \eta^{'} = \eta \dot{\phi}
 	      \end{equation}  
-		$\eta$ ... dynamische Viskosität\\
-		$\eta^{'}$ ... strahlungsind. Viskosität 
+		$\eta$ ... dynamische Viskosität mit $\left[\eta\right] = Pa \cdot s$\\
+		$\eta^{'}$ ... strahlungsind. Viskosität mit $\left[\eta^{'}\right] = Pa \cdot dpa$
 		
 	\item Beziehung zwischen dynamischer und strahlungsinduzierter Viskosität nach nach \cite{hobler2017hpm}
 	      \begin{equation}\label{eqn:visc_hobler}
@@ -188,21 +188,23 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 				\end{equation}
  mit $P_{ij}$ den Nicht-Diagonalelementen des Stress - Tensors. i beschreibt die Flussrichtung und j die Normalrichtung darauf. 
 		 	\item Problem: Druck variiert typischerweise sehr stark in MD Simulationen, daher ist die Konvergenz eher langsam\cite{Tenney2010}.
-		 	\item LAMMPS: Mit der Verwendung des fix nvt/sllod und fix deform 
+		 	\item LAMMPS: Mit der Verwendung des \texttt{fix nvt/sllod} und \texttt{fix deform} 
 				\begin{itemize}
-					\item fix nvt/sllod ist eine normale NVT simulation mit einem Nose/Hoover Thermostat, bei dem die Temperatur aus der kinetischen Energie der Teilchen abzüglich jener die durch die Scherung (die positionsabhängige 'Fließgeschwindigkeit' jedes Atoms wird von der Gesamtgeschwindigkeit abgezogen) berechnet wird.
-					\item fix deform verformt die Simulationsbox (zum Beispiel in xy Richtung mit konstanter Geschwindigkeit - siehe LAMMPS Beispiel in.nemd.2d)
-					\item Um die Gleichung \ref{equ:sllod} anzuwenden wird der resultierende Impulsfluss (aus fix ave/chunk für jeweils eine Ebene (definiert als Chunk) - Beispiel pxy) durch die Konstante Verschiebungsgeschwindigkeit (hier in x - Richung gesetzt mit fix deform) dividiert durch die Boxlänge (hier y Abmessung der Box) dividiert. 
+					\item \texttt{fix nvt/sllod} startet eine NVT-Simulation mit einem Nose/Hoover Thermostat. Die Temperatur wird dabei aus der kinetischen Energie der Teilchen abzüglich der von der Scherung herrührenden kinetischen Energie berechnet. (die positionsabhängige 'Fließgeschwindigkeit' jedes Atoms wird von der Gesamtgeschwindigkeit abgezogen)
+					\item \texttt{fix deform} verformt die Simulationsbox (zum Beispiel in xy-Richtung mit konstanter Rate - siehe LAMMPS Beispiel in.nemd.2d)
+					\item Um die Gleichung \ref{equ:sllod} anzuwenden, wird das Geschwindigkeitsprofil $v_x$ (mit \texttt{fix ave/chunk} für jeweils eine Ebene (definiert als Chunk)) ermittelt. Die sich durch die Verformung einstellende Impulsfluss (im Beispiel $p_{xy}$) wird durch die mittlere Geschwindigkeit $v_x$ dividiert durch die Boxlänge $l_y$ dividiert.
 				\end{itemize}
 		\end{itemize}
 		
 	\subsubsection{Moving Walls}
 	    \begin{itemize}
-		 	\item Wie mit der SLLOD Methode wird hier eine Wandregion geschert und der Drucktensor (Impulsfluss) berechnet.
-			\item LAMMPS: Definition der Wände mit region und group:
+		 	\item Wie in der SLLOD-Methode wird hier eine Wandregion geschert und der resultierende Drucktensor (Impulsfluss) beobachtet.
+			\item LAMMPS: Beispiel in.wall.2d  - Definition der Wände mit \texttt{region} und \texttt{group}:
 			\begin{itemize}
-				\item Mithilfe des velocity Kommandos wird eine Wand verschoben und auf die beweglichen Atome anschließend thermostatisiert
-				\item Danach wird mit compute temp/ramp auf wieder auf die gewünschte Verschiebungsgeschwindigkeit (z.B. $v_x$) und die neue Simulationsboxgröße (z.B. $L_y$) equilibriert und wie bei SLLOD mit fix ave/Chunk die Drucktensorelemente für die definierten Schichten überwacht.
+				\item Mithilfe des \texttt{velocity} Kommandos wird eine Wand verschoben und die gegenüberliegende Wand mit \texttt{fix setforce} fixiert.
+				\item Anschließend wird das Simulationsgebiet thermostatisiert (\texttt{fix langevin})
+				\item Mit \texttt{compute temp/ramp} wird die Temperatur abzüglich der mit \texttt{fix ave/chunk} berechneten Geschwindigkeit $v_x$ berechnet.
+				\item Nach diesem Equlibrierschritt wird die Viskosität gemäß Formel \ref{equ:sllod} wie mit der SLLOD-Methode berechnet.
 			\end{itemize}
 		\end{itemize}
 		
@@ -210,9 +212,9 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 	\begin{itemize}
 
  		 \item Strahlungsinduzierten Fluidität wird mittels Molekulardynamik (MD) in \cite{Mayr2003} berechnet. 
-  		 \item Zusammenfassung in in \cite{hobler2017hpm}.
+  		 \item Zusammenfassung in \cite{hobler2017hpm}.
   
-  		  \item Eine konstante biaxiale Verzerrung wurd aufgebracht (in 3D: $\varepsilon_{xx} = \varepsilon_{yy}$) und die Entwicklung der biaxialen Spannung beobachtet mit 
+  		  \item Eine konstante biaxiale Verzerrung wurde aufgebracht (in 3D: $\varepsilon_{xx} = \varepsilon_{yy}$) und die Entwicklung der biaxialen Spannung beobachtet mit 
 
    		 	\begin{equation}
 	    		\pdv{\sigma_{xx}}{n_{dpa}} + \frac{E_{bi}}{6\eta^{'}}\sigma_{xx} = 0
