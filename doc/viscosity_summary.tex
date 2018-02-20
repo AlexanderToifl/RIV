@@ -295,11 +295,83 @@ System wird verformt (Scherung) und die resultierende Spannung wird ermittelt.
 	\end{itemize}
 	
 	\subsubsection{Strahlungsinduzierte Viskosität}
+	Relaxation in Abhängigkeit von der Anzahl der Displacements.\\
+	Ein biaxialer Stress ($\sigma_{xx} = \sigma_{yy}$, alle anderen Komponenten des Spannungstensors sind 0) wird eingebracht. Herleitung aus dem viskoelastischen Modell\cite{hobler2017hpm}
+	\begin{equation}\label{eqn:visco1}
+	   \pdv{\bm{\varepsilon}^{'} }{n_\mathrm{dpa} } = \frac{1}{2G} \pdv{ \bm{\sigma}^{'} }{n_\mathrm{dpa}} + \frac{1}{2\eta^{'} }  \bm{\sigma}^{'} 
+	\end{equation}
 	
-	\textit{Kann man mit rNEMD auch die Relaxation in Abhängigkeit von der Anzahl der Displacements betrachten? Möglicherweise durch Lösen der viskoelastischen Materialgleichung für eingeprägte Schubspannung.}
-
-
-
+	\begin{align}\label{eqn:visco2}
+		p &= - B \varepsilon_\mathrm{V}\\
+		-\frac{1}{3} \left(\sigma_{xy} + \sigma_{yy} + \sigma_{zz} \right) &= - B \left( \varepsilon_{xx} + \varepsilon_{yy} + \varepsilon_{zz} \right)
+	\end{align}
+	
+	Da $\sigma_{xx} = \sigma_{yy}$ gilt, wird $\varepsilon_{xx} = \varepsilon_{yy}$ angenommen. Die deviatorischen Tensoren haben bezüglich der kartesischen Basis die Form
+	\begin{equation}
+	  \bm{\varepsilon}^{'}  = \begin{bmatrix}
+    \varepsilon_{xx} - \frac{1}{3} \left( \varepsilon_{xx} + \varepsilon_{yy} + \varepsilon_{zz} \right)     & \varepsilon_{xy} & \varepsilon_{xz} \\
+     \varepsilon_{xy} &  \varepsilon_{yy} - \frac{1}{3} \left( \varepsilon_{xx} + \varepsilon_{yy} + \varepsilon_{zz} \right)     &  \varepsilon_{yz}  \\
+     \varepsilon_{xz} &  \varepsilon_{yz} &  \varepsilon_{zz} - \frac{1}{3} \left( \varepsilon_{xx} + \varepsilon_{yy} + \varepsilon_{zz} \right)    
+\end{bmatrix}, 
+	\end{equation}
+	
+		\begin{equation}
+	  \bm{\sigma}^{'}  = \begin{bmatrix}
+    \sigma_{xx} - \frac{1}{3} \left( \sigma_{xx} + \sigma_{yy} + \sigma_{zz} \right)     & \sigma_{xy} & \sigma_{xz} \\
+     \sigma_{xy} &  \sigma_{yy} - \frac{1}{3} \left( \sigma_{xx} + \sigma_{yy} + \sigma_{zz} \right)     &  \sigma_{yz}  \\
+     \sigma_{xz} &  \sigma_{yz} &  \sigma_{zz} - \frac{1}{3} \left( \sigma_{xx} + \sigma_{yy} + \sigma_{zz} \right)    
+\end{bmatrix}.
+	\end{equation}
+	
+	Mit eingesetzten Randbedingungen ergibt sich
+	
+	\begin{equation}
+	  \bm{\varepsilon}^{'}  = \begin{bmatrix}
+    \frac{1}{3} \left( \varepsilon_{xx} - \varepsilon_{zz} \right)     & \varepsilon_{xy} & \varepsilon_{xz} \\
+     \varepsilon_{xy} &  \frac{1}{3} \left( \varepsilon_{xx} - \varepsilon_{zz} \right)     &  \varepsilon_{yz}  \\
+     \varepsilon_{xz} &  \varepsilon_{yz} &  - \frac{2}{3} \left( \varepsilon_{xx} - \varepsilon_{zz} \right)
+\end{bmatrix}, 
+	\end{equation}
+	
+		\begin{equation}
+	  \bm{\sigma}^{'}  = \begin{bmatrix}
+     \frac{1}{3} \sigma_{xx}     & 0 & 0 \\
+     0 & \frac{1}{3} \sigma_{xx}     & 0  \\
+    0 &  0 &  - \frac{2}{3} \sigma_{xx} 
+\end{bmatrix}.
+	\end{equation}
+	
+	Aus \refeqn{eqn:visco1} folgt, dass alle Nicht-Diagonalelemente des Verzerrungstensors konstant bei eingebrachter Spannung bleiben. Die xx- und yy-Kompontente in \refeqn{eqn:visco1} ergeben diesselbe Differentialgleichung, während die zz-Komponente eine Linearkombination ist. Daher reduziert sich die tensorielle auf eine skalare Differentialgleichung
+	\begin{equation}
+	 \pdv{  \left(\frac{1}{3} \left( \varepsilon_{xx} - \varepsilon_{zz} \right) \right) }{n_\mathrm{dpa} } = \frac{1}{2G} \pdv{ \left( \frac{1}{3} \sigma_{xx} \right)}{n_\mathrm{dpa}} + \frac{1}{2\eta^{'} }  \frac{1}{3} \sigma_{xx}
+	\end{equation}
+	
+    Die Normalspannung $\sigma_{xx}$ wird vorgegeben, daher ändert sie sich nicht, wenn displacements eingefügt werden.
+    
+    	\begin{equation}\label{eqn:scalar1}
+	 \pdv{  \left(\frac{1}{3} \left( \varepsilon_{xx} - \varepsilon_{zz} \right) \right) }{n_\mathrm{dpa} } = \frac{1}{2\eta^{'} }  \frac{1}{3} \sigma_{xx}
+	\end{equation}
+	
+	Die \refeqn{eqn:visco2} vereinfacht sich zu
+	
+	\begin{equation}\label{eqn:scalar2}
+	  -\frac{2}{3} \sigma_{xx} = - B \left( 2 \varepsilon_{xx} + \varepsilon_{zz} \right).
+	\end{equation}
+	
+	Wenn \refeqn{eqn:scalar2} in \refeqn{eqn:scalar1} eingesetzt wird, ergibt sich
+	
+	\begin{equation}
+	  - \frac{1}{2} \pdv{  \varepsilon_{zz} }{n_\mathrm{dpa} } = \frac{1}{2\eta^{'} }  \frac{1}{3} \sigma_{xx}
+	\end{equation}
+	
+	Daraus folgt der displacement-abhängige Verlauf der Dehnung in z-Richtung
+	\begin{equation}
+	  \boxed{ \varepsilon_{zz} = -  \frac{1}{3\eta^{'} }  \sigma_{xx} n_\mathrm{npa},}
+	\end{equation}
+ 	
+ 	also eine lineare Abhängigkeit von $n_\mathrm{dpa}$.
+	
+	
 \subsection{Gleichgewichts-MD Methoden (equilibrium MD, EMD)}
 Dynamische Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelementen des Spannungstensor} bestimmt. Die erhaltenen Wert gelten nur für \textbf{Newtonsche Fluide} ($\tau \propto \dot{\gamma}$). Prinzipiell sind die Ausdrücke nur im Grenzfall unendlich langer Simulationszeit und unendlich großer Simulationszelle gültig. Zusätzlich liegt typischerweise signifikantes thermisches Rauschen vor, was das SNR verringert. Daher ist eine große Zahl von Simulationsschritten nötig.\cite{Tenney2010}.
 
