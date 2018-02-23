@@ -461,7 +461,15 @@ Dynamische Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelemen
 		\item \textit{Wird der Begriff der strahlungsinduzierten Viskosität auch in der experimentellen Literatur verwendet?}
 	\end{itemize}
 
+\section{Simulation}
 
+\subsection{Erzeugen von a-Si aus c-Si}
+	\begin{itemize}
+		\item Gängige Methode zum Erzeugen von a-Si ist eine sogenannte \textit{Melt and Quench} Methode, bei der das kristalline Material geschmolzen und dann rapide abgekühlt wird.
+		\item Meist wird ein \textbf{Berendsen Thermostat} mit \textbf{Stillinger-Weber} Potentialen verwendet (oder sehr rechenintensive ReaxFF - Potentiale)
+		\item Erster Versuch mit ähnlichen Parametern wie bei der a-Ge Erzeugung in \cite{Mayr2005}.
+		\item Verifizierung mit unterschiedlichen Kühlraten (Energie soll am Ende gleich bleiben? - TBD).
+	\end{itemize}
 
 \bibliographystyle{Citation/IEEEbib-c.bst}
 \bibliography{Citation/MolecularDynamics}
