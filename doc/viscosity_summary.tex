@@ -463,12 +463,29 @@ Dynamische Viskosität wird über Fluktuationen der \textbf{Nicht-Diagonalelemen
 
 \section{Simulation}
 
+Als einzigen Vergleichswert für a-Si findet man in \cite{Vauth2007} $\eta(T=\SI{300}{K}) = \SI{9.656e8}{dpa}$.
+
 \subsection{Erzeugen von a-Si aus c-Si}
 	\begin{itemize}
 		\item Gängige Methode zum Erzeugen von a-Si ist eine sogenannte \textit{Melt and Quench} Methode, bei der das kristalline Material geschmolzen und dann rapide abgekühlt wird.
 		\item Meist wird ein \textbf{Berendsen Thermostat} mit \textbf{Stillinger-Weber} Potentialen verwendet (oder sehr rechenintensive ReaxFF - Potentiale)
 		\item Erster Versuch mit ähnlichen Parametern wie bei der a-Ge Erzeugung in \cite{Mayr2005}.
 		\item Verifizierung mit unterschiedlichen Kühlraten (Energie soll am Ende gleich bleiben? - TBD).
+		\item In \cite{Vauth2007} wird a-Si aus flüssigem Si (mit \SI{6000}{K}), welches mit \SI{20}{Kps^{-1}} auf \SI{10}{K} gekühlt wird, erzeugt. Dabei wurden aber im Unterschied zu \cite{Mayr2005} Tersoff-Potentiale ausschließlich verwendet (eigentlich zu hoher Schmelzpunkt).
+	\end{itemize}
+
+\subsection{biaxiale Verzerrung}
+	\begin{itemize}
+		\item Verwenden des \texttt{fix deform} Kommandos, um die Simulationszelle gleich in x- und y-Richtung zu verformen.
+		\item unterschiedliche Verformungen (in Vielfachen der Kantenlänge) geben unterschiedlich Startwerte für die biaxiale Spannung ($\sigma_{xx0}$) - evtl. mit Werten aus \cite{Mayr2005} und \cite{Mayr2003} ($\sigma_0 = \SI{1}{\giga\pascal}$) vergleichen.
+	\end{itemize}
+
+\subsection{Recoilgeneration}
+	\begin{itemize}
+		\item Verwenden des \texttt{velocity} Kommandos um \textbf{einem} zufällig ausgewählten Atom eine zufällige Geschwindigkeit zuzuweisen
+		\item Vorschlag: Generieren der zufälligen Geschwindigkeitskomponenten in Python und schreiben der Variablen in .in File
+		\item Größe der Simulationsbox muss abhängig sein von der eingebrachten Energie.
+		\item Randbedingungen verwenden um Aufheizen zu vermeiden - vgl. Sputtern
 	\end{itemize}
 
 \bibliographystyle{Citation/IEEEbib-c.bst}
