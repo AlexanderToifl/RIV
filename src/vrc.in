@@ -34,7 +34,7 @@ fix 			2 all temp/berendsen ${temp_lower} ${temp_upper} 0.1
 reset_timestep 0
 timestep		0.001
 
-dump			1 all atom 100 dump.vrc1
+dump			8 all atom 100 dump.vrc5
 
 thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
 thermo			100
@@ -56,8 +56,6 @@ print "Temperature T: ${tmp1}"
 
 
 #Equilibration
-
-dump			2 all atom 100 dump.vrc2
 run 4000
 
 #choose random atom 
@@ -71,6 +69,38 @@ group matoms id ${rn_id}
 velocity matoms set 10 10 10
 #velocity matoms scale 100 <-- does not work
 
-dump			6 all atom 100 dump.vrc3
 
 run 4000
+
+#deform in x direction
+
+fix		3 all deform 1 x scale 0.8 remap x
+
+
+variable strain equal "(lx - v_L0)/v_L0"
+variable p1 equal "v_strain"
+variable p2 equal "-pxx/10000"
+variable p3 equal "-pyy/10000"
+variable p4 equal "-pzz/10000"
+fix def1 all print 100 "${p1} ${p2} ${p3} ${p4}" file x_compression.txt screen no
+
+
+run 1000
+unfix 3
+
+#deform in y direction
+
+fix		3 all deform 1 y scale 0.8 remap x
+
+variable strain equal "(ly - v_L0)/v_L0"
+variable p1 equal "v_strain"
+variable p2 equal "-pxx/10000"
+variable p3 equal "-pyy/10000"
+variable p4 equal "-pzz/10000"
+fix def1 all print 100 "${p1} ${p2} ${p3} ${p4}" file y_compression.txt screen no
+
+run 1000
+unfix 3
+
+run 5000
+
