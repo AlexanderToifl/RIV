@@ -1,0 +1,59 @@
+read_data amorph.dat
+
+
+neighbor 		0.3 bin
+neigh_modify	delay 1
+
+#use Stillinger - Weber Potential to generate a-Si
+
+mass			1 28.09
+pair_style		sw
+pair_coeff		* * Si.sw Si
+
+
+#atom_modify sort 0 0
+
+thermo_style	custom step atoms temp epair etotal press
+thermo			100
+thermo_modify	lost ignore flush yes
+dump			1 all atom 100 dump.biaxial
+
+variable tmp equal "lx"
+variable L0 equal ${tmp}
+
+
+reset_timestep	0
+timestep 0.001
+fix 			1 all nve
+
+
+
+#Biaxial deformation
+variable deform_scale equal 0.9
+
+
+#deform in x direction
+
+fix		3 all deform 1 x scale ${deform_scale} remap x
+
+variable strainx equal "(lx - v_L0)/v_L0"
+variable strainy equal "(ly - v_L0)/v_L0"
+variable p1 equal "v_strainx"
+variable p2 equal "v_strainy"
+variable p3 equal "-pxx/10000"
+variable p4 equal "-pyy/10000"
+variable p5 equal "-pzz/10000"
+fix def1 all print 100 "${p1} ${p2} ${p3} ${p4} ${p5}" file deformation.txt screen no
+
+
+run 1000
+unfix 3
+
+#deform in y direction
+
+fix		3 all deform 1 y scale ${deform_scale} remap x
+
+run 1000
+unfix 3
+
+run 5000

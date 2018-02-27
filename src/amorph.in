@@ -56,3 +56,5 @@ fix 			2 all temp/berendsen ${temp_anneal} ${temp_lower} 0.1
 dump			5 all atom 100 dump.amorph5
 
 run 5500
+
+write_data amorph.dat
