@@ -4,6 +4,7 @@ units 		metal
 
 variable temp_lower equal 300.
 variable temp_upper equal 400.
+variable massvar 	equal 28.09
 
 variable unit_cell equal 4
 
@@ -21,7 +22,7 @@ create_atoms	1 region base
 
 #use Stillinger - Weber Potential to generate a-Si
 
-mass			1 28.09
+mass			1 ${massvar}
 pair_style		sw
 pair_coeff		* * Si.sw Si
 
@@ -58,19 +59,48 @@ print "Temperature T: ${tmp1}"
 #Equilibration
 run 4000
 
-#choose random atom 
+variable ekin equal 50
+variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
+variable v0 equal ${vel}
+
+print "Velocity v: ${v0}"
+
 variable tmp2 equal "atoms"
+
+variable i loop 3
+
+#Start loop
+
+label loop
+dump 1 all atom 100 testfile.$i
+
+### Calculate velocity components (finally working but far from elegant)
+
+variable vx equal random(0,${vel},5974)
+variable v1 equal ${vx}
+variable vtemp1 equal "(v_v0^2 - v_v1^2)^(1./2.)"
+variable vy equal random(0,${vtemp1},8795)
+variable v2 equal ${vy}
+variable vz equal "(v_v0^2 - v_v1^2 - v_v2^2)^(1./2.)"
+print "Velocity vx: ${v1}"
+print "Velocity vy: ${v2}"
+print "Velocity vz: ${vz}"
+
+#choose random atom 
 variable rn_id equal floor(random(0,${tmp2},30491))
 print "Random id: ${rn_id}"
 
 #define group that contains the chosen atom
-group matoms id ${rn_id}
-
-velocity matoms set 10 10 10
+group ${i} id ${rn_id}
+velocity ${i} set ${v1} ${v2} ${vz}
 #velocity matoms scale 100 <-- does not work
 
-
 run 4000
+
+undump 1
+next i
+jump vrc.in loop
+
 
 #deform in x direction
 
