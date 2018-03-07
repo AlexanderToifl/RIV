@@ -6,7 +6,18 @@ variable temp_lower equal 300.
 variable temp_anneal equal 1400. 
 variable temp_upper equal 3500.
 
-variable unit_cell equal 4
+variable massvar 	equal 28.09
+variable unit_cell 	equal 4
+variable eng_cell_k	equal 25		#Atoms per eV
+
+variable i loop 20
+variable ekin equal 500							#eV
+variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
+variable v0 equal ${vel}
+print "Velocity v: ${v0}"
+
+variable cell_size	equal "floor((((v_ekin*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1"
+print "Cell_size a: ${cell_size}"
 
 boundary 	p p p
 atom_style	atomic
@@ -16,7 +27,7 @@ neigh_modify	delay 1
 
 lattice			diamond 5.432
 
-region			base block 0 ${unit_cell} 0 ${unit_cell} 0 ${unit_cell} units lattice
+region			base block 0 ${cell_size} 0 ${cell_size} 0 ${cell_size} units lattice
 create_box		1 base
 create_atoms	1 region base
 

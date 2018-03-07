@@ -59,7 +59,7 @@ print "Temperature T: ${tmp1}"
 #Equilibration
 run 4000
 
-variable ekin equal 50
+variable ekin equal 500				#eV
 variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
 variable v0 equal ${vel}
 
