@@ -482,9 +482,28 @@ Als einzigen Vergleichswert für a-Si findet man in \cite{Vauth2007} $\eta(T=\SI
 
 \subsection{Recoilgeneration}
 	\begin{itemize}
-		\item Verwenden des \texttt{velocity} Kommandos um \textbf{einem} zufällig ausgewählten Atom eine zufällige Geschwindigkeit zuzuweisen
-		\item Vorschlag: Generieren der zufälligen Geschwindigkeitskomponenten in Python und schreiben der Variablen in .in File
-		\item Größe der Simulationsbox muss abhängig sein von der eingebrachten Energie.
+		\item Verwenden des \texttt{velocity} Kommandos um \textbf{einem} zufällig ausgewählten Atom eine zufällige Geschwindigkeit zuzuweisen. Dazu wird die Anzahl der Atome ausgelesen und eine gleichverteilte Zufallsvariable erzeugt. Die daraus gewonnen Atom ID wird verwendet, 
+		um das ausgewählte Atom einer Gruppe hinzuzufügen auf die das \texttt{velocity} Kommando angewandt wird.
+		\item Die für das \texttt{velocity} Kommando notwendigen Geschwindigkeitskomponenten werden aus der kinetischen Energie berechnet.
+		\begin{equation}
+			\abs{v} = \sqrt{\frac{2E_{kin}}{m}},
+			\label{eq:vel}
+		\end{equation}
+		wobei die erste Geschwindigkeitskomponente ($v_x$) wiederum aus einer gleichverteilten Zufallsvariable (begrenzt durch den Betrag \ref{eq:vel}) erzeugt wird. Die zweite Komponente ($v_y$) wird ebenfalls zufällig erzeugt (mithilfe des verbleibenden Geschw.betrages), 
+		$v_z$ ergibt sich damit automatisch.
+		\begin{equation}
+			\abs{v} = \sqrt{\abs{v_x}^2+\abs{v_y}^2+\abs{v_z}^2}
+		\end{equation}
+		\begin{equation}
+			\abs{v_x} = \mathrm{rand}\left(0,\abs{v}\right) 
+		\end{equation}
+		\begin{equation}
+			\abs{v_y} = \mathrm{rand}\left(0,\sqrt{\abs{v}^2-\abs{v_x}^2}\right)
+		\end{equation}
+		\begin{equation}
+			\abs{v_z} = \sqrt{\abs{v}^2-\abs{v_x}^2-\abs{v_y}^2}
+		\end{equation}
+		\item Die Größe der Simulationsbox wird ebenfalls anhand der durch Recoils eingebrachten kinetischen Energie berechnet. Ausgehend von einer minimalen Simulationsbox, werden pro eV kinetischer Energie eine gewisse Anzahl Atome simuliert.
 		\item Randbedingungen verwenden um Aufheizen zu vermeiden - vgl. Sputtern
 	\end{itemize}
 
