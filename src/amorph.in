@@ -7,10 +7,10 @@ variable temp_anneal equal 1400.
 variable temp_upper equal 3500.
 
 variable massvar 	equal 28.09
-variable unit_cell 	equal 4
-variable eng_cell_k	equal 25		#Atoms per eV
+variable unit_cell 	equal 1
+variable eng_cell_k	equal 5		#Atoms per eV
 
-variable i loop 20
+variable i loop 1
 variable ekin equal 500							#eV
 variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
 variable v0 equal ${vel}

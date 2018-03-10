@@ -11,7 +11,7 @@ variable massvar 	equal 28.09
 variable unit_cell 	equal 4
 variable eng_cell_k	equal 25		#Atoms per eV
 
-variable i loop 20
+variable i loop 1 #number of recoils
 variable ekin equal 500							#eV
 variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
 variable v0 equal ${vel}
@@ -32,6 +32,11 @@ mass			1 ${massvar}
 pair_style		tersoff
 pair_coeff		* * Si.tersoff Si
 
+
+
+
+variable 4 equal 0.1
+
 reset_timestep 0
 timestep		0.001
 fix 			1 all nve
@@ -40,44 +45,11 @@ thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp
 thermo			100
 thermo_modify	lost ignore flush yes
 
-#Equilibration
-run 4000
 
 
-####################### Recoil Insertion ###############################
-variable tmp2 equal "atoms"
+dump 1 all atom 100 dump_biax_recoil
 
-#Start loop
 
-label loop
-dump 1 all atom 100 testfile.$i
-
-### Calculate velocity components (finally working but far from elegant)
-
-variable vx equal random(0,${vel},5974)
-variable v1 equal ${vx}
-variable vtemp1 equal "(v_v0^2 - v_v1^2)^(1./2.)"
-variable vy equal random(0,${vtemp1},8795)
-variable v2 equal ${vy}
-variable vz equal "(v_v0^2 - v_v1^2 - v_v2^2)^(1./2.)"
-print "Velocity vx: ${v1}"
-print "Velocity vy: ${v2}"
-print "Velocity vz: ${vz}"
-
-#choose random atom 
-variable rn_id equal floor(random(0,${tmp2},30491))
-print "Random id: ${rn_id}"
-
-#define group that contains the chosen atom
-group ${i} id ${rn_id}
-velocity ${i} set ${v1} ${v2} ${vz}
-#velocity matoms scale 100 <-- does not work
-
-run 4000
-
-undump 1
-next i
-jump vrc.in loop
 
 
 ################### Biaxial deformation ################################
@@ -97,15 +69,87 @@ variable p5 equal "-pzz/10000"
 fix def1 all print 100 "${p1} ${p2} ${p3} ${p4} ${p5}" file deformation.txt screen no
 
 
-run 1000
+run 500
 unfix 3
 
 #deform in y direction
 
 fix		3 all deform 1 y scale ${deform_scale} remap x
 
-run 1000
+run 500
 unfix 3
 
-run 5000
+
+################# Thermostat and Zero Force Border ####################
+
+#geometry 
+variable zero_width equal 0.1
+variable therstat_width equal 1.0
+
+variable zero_max_xy equal "(lx - v_zero_width)"
+variable zero_max_z equal "(lz - v_zero_width)"
+
+variable therstat_min equal "(v_zero_width + v_therstat_width)"
+variable therstat_max_xy equal "(lx - v_zero_width - v_therstat_width)"
+variable therstat_max_z equal "(lz - v_zero_width - v_therstat_width)"
+
+#thermostat parameters
+variable therstat_seed equal 23145
+variable therstat_t_start equal 300 #what to set here?
+variable therstat_t_stop equal 300
+
+
+#zero force
+region     zero_force_inverse block ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_z}
+group	   zero_force_inverse_group  region zero_force_inverse
+group      zero_force subtract all  zero_force_inverse_group
+
+fix        4 zero_force setforce 0.0 0.0 0.0
+
+
+
+#thermostat
+region     therstat_inverse block ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_z}
+group	   therstat_inverse_group region therstat_inverse
+group      thermo subtract all therstat_inverse_group
+
+fix	    5 thermo temp/berendsen ${therstat_t_start} ${therstat_t_stop} 0.1
+
+
+
+####################### Recoil Insertion ###############################
+variable tmp2 equal "atoms"
+
+#Start loop
+
+label loop
+#dump 1 all atom 100 testfile.$i
+
+### Calculate velocity components
+
+variable vx equal random(0,${vel},5974)
+variable v1 equal ${vx}
+variable vtemp1 equal "(v_v0^2 - v_v1^2)^(1./2.)"
+variable vy equal random(0,${vtemp1},8795)
+variable v2 equal ${vy}
+variable vz equal "(v_v0^2 - v_v1^2 - v_v2^2)^(1./2.)"
+print "Velocity vx: ${v1}"
+print "Velocity vy: ${v2}"
+print "Velocity vz: ${vz}"
+
+#choose random atom 
+variable rn_id equal floor(random(0,${tmp2},30491))
+print "Random id: ${rn_id}"
+
+#define group that contains the chosen atom
+group ${i} id ${rn_id}
+velocity ${i} set ${v1} ${v2} ${vz}
+
+
+run 4000
+
+#undump 1
+next i
+jump vrc.in loop
+
 
