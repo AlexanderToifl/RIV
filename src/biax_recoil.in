@@ -8,10 +8,10 @@ read_data amorph.dat
 variable temp_lower equal 300.
 variable temp_upper equal 400.
 variable massvar 	equal 28.09
-variable unit_cell 	equal 4
-variable eng_cell_k	equal 25		#Atoms per eV
+variable unit_cell 	equal 1#4
+variable eng_cell_k	equal 1#25		#Atoms per eV
 
-variable i loop 1 #number of recoils
+variable i loop 16 #number of recoils
 variable ekin equal 500							#eV
 variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
 variable v0 equal ${vel}
@@ -79,12 +79,19 @@ fix		3 all deform 1 y scale ${deform_scale} remap x
 run 500
 unfix 3
 
+#thermostat parameters
+variable therstat_seed equal 23145
+variable therstat_damp equal 0.5
+fix	    5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
+
+run 4000
+unfix 5
 
 ################# Thermostat and Zero Force Border ####################
 
 #geometry 
-variable zero_width equal 0.1
-variable therstat_width equal 1.0
+variable zero_width equal 0.2
+variable therstat_width equal 2.0
 
 variable zero_max_xy equal "(lx - v_zero_width)"
 variable zero_max_z equal "(lz - v_zero_width)"
@@ -93,15 +100,12 @@ variable therstat_min equal "(v_zero_width + v_therstat_width)"
 variable therstat_max_xy equal "(lx - v_zero_width - v_therstat_width)"
 variable therstat_max_z equal "(lz - v_zero_width - v_therstat_width)"
 
-#thermostat parameters
-variable therstat_seed equal 23145
-variable therstat_t_start equal 300 #what to set here?
-variable therstat_t_stop equal 300
 
+variable therstat_damp equal 0.001
 
 #zero force
 region     zero_force_inverse block ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_z}
-group	   zero_force_inverse_group  region zero_force_inverse
+group	   zero_force_inverse_group region zero_force_inverse
 group      zero_force subtract all  zero_force_inverse_group
 
 fix        4 zero_force setforce 0.0 0.0 0.0
@@ -113,8 +117,11 @@ region     therstat_inverse block ${therstat_min} ${therstat_max_xy} ${therstat_
 group	   therstat_inverse_group region therstat_inverse
 group      thermo subtract all therstat_inverse_group
 
-fix	    5 thermo temp/berendsen ${therstat_t_start} ${therstat_t_stop} 0.1
+fix	    5 thermo temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
+
+#equilibration to achieve temperature ${temp_lower}
+run 20000
 
 
 ####################### Recoil Insertion ###############################
@@ -150,6 +157,6 @@ run 4000
 
 #undump 1
 next i
-jump vrc.in loop
+jump biax_recoil.in loop
 
 
