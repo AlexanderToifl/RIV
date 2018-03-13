@@ -8,10 +8,10 @@ read_data amorph.dat
 variable temp_lower equal 300.
 variable temp_upper equal 400.
 variable massvar 	equal 28.09
-variable unit_cell 	equal 1#4
-variable eng_cell_k	equal 1#25		#Atoms per eV
+variable unit_cell 	equal 4
+variable eng_cell_k	equal 5#25		#Atoms per eV
 
-variable i loop 16 #number of recoils
+variable i loop 2 #number of recoils
 variable ekin equal 500							#eV
 variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
 variable v0 equal ${vel}
@@ -32,7 +32,10 @@ mass			1 ${massvar}
 pair_style		tersoff
 pair_coeff		* * Si.tersoff Si
 
+#pair_style		sw
+#pair_coeff		* * Si.sw Si
 
+lattice			diamond 5.432
 
 
 variable 4 equal 0.1
@@ -49,7 +52,15 @@ thermo_modify	lost ignore flush yes
 
 dump 1 all atom 100 dump_biax_recoil
 
+#thermostat parameters
+#variable therstat_seed equal 23145
+#variable therstat_damp equal 0.5
+#fix	5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
+
+
+#run 1500
+#unfix 5
 
 
 ################### Biaxial deformation ################################
@@ -57,7 +68,15 @@ variable deform_scale equal 0.9
 
 #deform in x direction
 
-fix		3 all deform 1 x scale ${deform_scale} remap x
+#thermostat parameters
+variable therstat_seed equal 23145
+variable therstat_damp equal 0.5
+#fix	    5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
+
+fix	    4 all nvt/sllod temp ${temp_lower} ${temp_lower} ${therstat_damp}
+fix		3 all deform 1 x scale ${deform_scale} remap v
+
+thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp c_4_temp
 
 variable strainx equal "(lx - v_L0)/v_L0"
 variable strainy equal "(ly - v_L0)/v_L0"
@@ -73,25 +92,35 @@ run 500
 unfix 3
 
 #deform in y direction
-
-fix		3 all deform 1 y scale ${deform_scale} remap x
+fix		3 all deform 1 y scale ${deform_scale} remap v
 
 run 500
 unfix 3
 
+
 #thermostat parameters
-variable therstat_seed equal 23145
-variable therstat_damp equal 0.5
-fix	    5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
+#variable therstat_seed equal 23145
+#variable therstat_damp equal 0.5
+#fix	    5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
-run 4000
-unfix 5
+#fix	    5 all nvt/sllod temp ${temp_lower} ${temp_lower} ${therstat_damp}
 
-################# Thermostat and Zero Force Border ####################
+
+#unfix 5
+unfix 4
+
+
+thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
+
+
+fix		3 all deform 5 z scale 2.0 remap none
+run 500
+
+################# Thermostat and Zero Force Border #####################
 
 #geometry 
 variable zero_width equal 0.2
-variable therstat_width equal 2.0
+variable therstat_width equal 1.0
 
 variable zero_max_xy equal "(lx - v_zero_width)"
 variable zero_max_z equal "(lz - v_zero_width)"
@@ -104,16 +133,16 @@ variable therstat_max_z equal "(lz - v_zero_width - v_therstat_width)"
 variable therstat_damp equal 0.001
 
 #zero force
-region     zero_force_inverse block ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_z}
-group	   zero_force_inverse_group region zero_force_inverse
-group      zero_force subtract all  zero_force_inverse_group
+#region     zero_force_inverse block ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_z} units lattice
+#group	   zero_force_inverse_group region zero_force_inverse
+#group      zero_force subtract all  zero_force_inverse_group
 
-fix        4 zero_force setforce 0.0 0.0 0.0
+#fix        4 zero_force setforce 0.0 0.0 0.0
 
 
 
 #thermostat
-region     therstat_inverse block ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_z}
+region     therstat_inverse block ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_z} units lattice
 group	   therstat_inverse_group region therstat_inverse
 group      thermo subtract all therstat_inverse_group
 
@@ -121,7 +150,7 @@ fix	    5 thermo temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
 
 #equilibration to achieve temperature ${temp_lower}
-run 20000
+#run 2000
 
 
 ####################### Recoil Insertion ###############################
@@ -153,10 +182,12 @@ group ${i} id ${rn_id}
 velocity ${i} set ${v1} ${v2} ${vz}
 
 
-run 4000
+run 1000
 
 #undump 1
 next i
 jump biax_recoil.in loop
 
+### last equilibrium step - check
+run 10000
 
