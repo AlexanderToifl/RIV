@@ -2,21 +2,21 @@
 
 units 		metal
 
-variable temp_lower equal 300.
+variable temp_lower equal 10.
 variable temp_anneal equal 1400. 
 variable temp_upper equal 3500.
 
 variable massvar 	equal 28.09
-variable unit_cell 	equal 1#4
-variable eng_cell_k	equal 1#25		#Atoms per eV
+variable unit_cell 	equal 4
+variable eng_cell_k	equal 2#25		#Atoms per eV
 
-variable i loop 16
+variable i loop 1
 variable ekin equal 500							#eV
 variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
 variable v0 equal ${vel}
 print "Velocity v: ${v0}"
 
-variable cell_size	equal "floor((((v_ekin*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1"
+variable cell_size	equal "floor((((v_ekin*v_i*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1"
 print "Cell_size a: ${cell_size}"
 
 boundary 	p p p
