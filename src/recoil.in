@@ -1,13 +1,8 @@
-### Main Simulation - RIV          ###
-### Alexander Toifl 	- E1228803 ###
-### Christian Schleich 	- E1325958 ###
 
 units 		metal
 boundary 	p p s
 
-
-#Load a-Si sample
-read_data amorph.dat
+read_data deform.dat
 
 variable temp_lower equal 10.
 variable temp_upper equal 10.
@@ -15,10 +10,10 @@ variable massvar 	equal 28.09
 variable unit_cell 	equal 4
 variable eng_cell_k	equal 25		#Atoms per eV
 
-variable i_max equal 5				#Nr. of recoils
+variable i_max equal 1				#Nr. of recoils
 variable i loop ${i_max}
 
-variable ekin equal 50							#eV
+variable ekin equal 80						#eV
 variable vel equal "(2*1.602*10^(-19.) * v_ekin/(v_massvar*1.6605*10^(-27)))^(1./2.) / 100."
 variable v0 equal ${vel}
 print "Velocity v: ${v0}"
@@ -43,9 +38,6 @@ pair_coeff		* * Si.sw Si
 
 lattice			diamond 5.432
 
-
-variable 4 equal 0.1
-
 reset_timestep 0
 timestep		0.001
 fix 			1 all nve
@@ -54,9 +46,7 @@ thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp
 thermo			100
 thermo_modify	lost ignore flush yes
 
-
-
-dump 1 all atom 50 dump_biax_recoil
+dump 1 all atom 50 dump_recoil
 
 #thermostat parameters
 #variable therstat_seed equal 23145
@@ -64,68 +54,8 @@ dump 1 all atom 50 dump_biax_recoil
 #fix	5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
 
-
 run 500
 #unfix 5
-
-
-################### Biaxial deformation ################################
-
-
-#thermostat parameters
-variable therstat_seed equal 23145
-variable therstat_damp equal 0.5
-#fix	    5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
-
-#fix	    4 all nvt/sllod temp ${temp_lower} ${temp_lower} ${therstat_damp}
-
-thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp #c_4_temp
-
-variable strainx equal "(lx - v_L0)/v_L0"
-variable strainy equal "(ly - v_L0)/v_L0"
-variable p1 equal "v_strainx"
-variable p2 equal "v_strainy"
-variable p3 equal "-pxx/100000"
-variable p4 equal "-pyy/100000"
-variable p5 equal "-pzz/100000"
-fix def1 all print 100 "${p1} ${p2} ${p3} ${p4} ${p5}" file deformation.txt screen no
-
-variable n_steps loop 40
-variable deform_scale equal 0.9
-variable scale_factor equal "(v_deform_scale)^(1./40.)" #exponent be 1 / n_steps - datatype!
-
-label def
-
-#deform in x direction
-fix		3 all deform 1 y scale ${scale_factor} remap x
-run 100
-unfix 3
-
-#deform in y direction
-fix		3 all deform 1 x scale ${scale_factor} remap x
-run 100
-unfix 3
-
-next n_steps
-jump biax_recoil.in def
-
-#thermostat parameters
-#variable therstat_seed equal 23145
-#variable therstat_damp equal 0.5
-#fix	    5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
-
-#fix	    5 all nvt/sllod temp ${temp_lower} ${temp_lower} ${therstat_damp}
-
-
-#unfix 5
-#unfix 4
-
-
-thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
-
-
-#fix		3 all deform 5 z scale 2.0 remap none
-#run 500
 
 ################# Thermostat and Zero Force Border #####################
 
@@ -160,12 +90,6 @@ group      thermo subtract all therstat_inverse_group
 fix	    5 thermo temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
 
-#equilibration to achieve temperature ${temp_lower}
-run 10000	
-
-write_data deform.dat
-
-
 ####################### Recoil Insertion ###############################
 variable tmp2 equal "atoms"
 
@@ -184,7 +108,7 @@ label loop
 ### Calculate velocity components
 
 # This FIRST random seed is used for all the following random nr. calculations!!!!
-variable vx equal random(0,${vel},28)
+variable vx equal random(0,${vel},5974)
 variable v1 equal ${vx}
 variable vtemp1 equal "(v_v0^2 - v_v1^2)^(1./2.)"
 # this random seed is NOT used
@@ -213,4 +137,3 @@ jump biax_recoil.in loop
 
 ### last equilibrium step - check
 run 20000
-
