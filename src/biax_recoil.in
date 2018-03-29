@@ -3,19 +3,17 @@
 ### Christian Schleich 	- E1325958 ###
 
 units 		metal
-boundary 	p p s
+boundary 	p p p
 
-
-#Load a-Si sample
-read_data amorph.dat
+atom_style	atomic
 
 variable temp_lower equal 10.
 variable temp_upper equal 10.
 variable massvar 	equal 28.09
-variable unit_cell 	equal 4
+variable unit_cell 	equal 6
 variable eng_cell_k	equal 25		#Atoms per eV
 
-variable i_max equal 5				#Nr. of recoils
+variable i_max equal 10				#Nr. of recoils
 variable i loop ${i_max}
 
 variable ekin equal 50							#eV
@@ -23,8 +21,24 @@ variable vel equal "(2*1.602*10^(-19.) * v_ekin/(v_massvar*1.6605*10^(-27)))^(1.
 variable v0 equal ${vel}
 print "Velocity v: ${v0}"
 
-variable cell_size	equal "floor((((v_ekin*v_i*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1"
+variable cell_size	equal "floor((((v_ekin*v_i_max*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1"
 print "Cell_size a: ${cell_size}"
+
+#variable box_min equal "v_cell_size * -0.5"
+#variable box_max equal "v_cell_size * 1.5"
+
+#print "MIN: ${box_min}" 
+#print "MAX: ${box_max}"
+
+lattice			diamond 5.432
+
+#region			box block 0 ${cell_size} 0 ${cell_size} ${box_min} ${box_max} units lattice
+#create_box		1 box
+
+#Load a-Si sample
+read_data amorph.dat #add merge
+
+
 
 variable tmp equal "lx"
 variable L0 equal ${tmp}
@@ -32,6 +46,9 @@ print "Initial Length, L0: ${L0}"
 
 neighbor 		0.3 bin
 neigh_modify	delay 1
+
+
+
 
 #use Tersoff Potential
 mass			1 28.09
@@ -45,10 +62,12 @@ lattice			diamond 5.432
 
 
 variable 4 equal 0.1
+variable therstat_damp equal 1.0
+variable barostat_damp equal 0.5
 
 reset_timestep 0
 timestep		0.001
-fix 			1 all nve
+fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} iso 0.0 0.0 ${barostat_damp}
 
 thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
 thermo			100
@@ -65,11 +84,14 @@ dump 1 all atom 50 dump_biax_recoil
 
 
 
-run 500
+run 1000
 #unfix 5
 
 
 ################### Biaxial deformation ################################
+
+
+fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} z 0.0 0.0 ${barostat_damp}
 
 
 #thermostat parameters
@@ -105,6 +127,8 @@ unfix 3
 fix		3 all deform 1 x scale ${scale_factor} remap x
 run 100
 unfix 3
+
+#fix 	9 all box/relax z 0.0 vmax 0.01 nreset 100
 
 next n_steps
 jump biax_recoil.in def

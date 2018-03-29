@@ -1,25 +1,38 @@
 
 units 		metal
-boundary 	p p s
-
-read_data deform.dat
+boundary 	p p p
 
 variable temp_lower equal 10.
 variable temp_upper equal 10.
 variable massvar 	equal 28.09
-variable unit_cell 	equal 4
+variable unit_cell 	equal 6
 variable eng_cell_k	equal 25		#Atoms per eV
 
-variable i_max equal 1				#Nr. of recoils
+variable i_max equal 40				#Nr. of recoils
 variable i loop ${i_max}
 
-variable ekin equal 80						#eV
+variable ekin equal 50						#eV
 variable vel equal "(2*1.602*10^(-19.) * v_ekin/(v_massvar*1.6605*10^(-27)))^(1./2.) / 100."
 variable v0 equal ${vel}
 print "Velocity v: ${v0}"
 
-variable cell_size	equal "floor((((v_ekin*v_i*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1"
+variable cell_size	equal "(floor((((v_ekin*v_i_max*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1) * 0.9"
+variable xy_min equal "(floor((((v_ekin*v_i_max*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1) - v_cell_size"
 print "Cell_size a: ${cell_size}"
+
+
+
+lattice			diamond 5.432
+
+
+
+variable box_min equal "v_cell_size * -0.2"
+variable box_max equal "v_cell_size * 1.3"
+
+#region			box block ${xy_min} ${cell_size} ${xy_min} ${cell_size} ${box_min} ${box_max} units lattice
+#create_box		1 box
+
+read_data deform.dat #add merge
 
 variable tmp equal "lx"
 variable L0 equal ${tmp}
@@ -29,24 +42,36 @@ neighbor 		0.3 bin
 neigh_modify	delay 1
 
 #use Tersoff Potential
-mass			1 28.09
+mass			* 28.09
 #pair_style		tersoff
 #pair_coeff		* * Si.tersoff Si
 
 pair_style		sw
 pair_coeff		* * Si.sw Si
 
-lattice			diamond 5.432
+variable therstat_damp equal 0.4
+variable barostat_damp equal 0.5
 
 reset_timestep 0
 timestep		0.001
-fix 			1 all nve
+
+fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} z 0.0 0.0 ${barostat_damp}
+#fix 			1 all nve
 
 thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
 thermo			100
 thermo_modify	lost ignore flush yes
 
-dump 1 all atom 50 dump_recoil
+variable strainx equal "(lx - v_L0)/v_L0"
+variable strainy equal "(ly - v_L0)/v_L0"
+variable p1 equal "v_strainx"
+variable p2 equal "v_strainy"
+variable p3 equal "-pxx/100000"
+variable p4 equal "-pyy/100000"
+variable p5 equal "-pzz/100000"
+fix def1 all print 500 "${p1} ${p2} ${p3} ${p4} ${p5}" file deformation_recoil.txt screen no
+
+dump 1 all atom 200 dump_recoil
 
 #thermostat parameters
 #variable therstat_seed equal 23145
@@ -71,7 +96,7 @@ variable therstat_max_xy equal "(lx - v_zero_width - v_therstat_width)"
 variable therstat_max_z equal "(lz - v_zero_width - v_therstat_width)"
 
 
-variable therstat_damp equal 0.001
+variable therstat_damp equal 0.4
 
 #zero force
 #region     zero_force_inverse block ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_z} units box
@@ -108,7 +133,7 @@ label loop
 ### Calculate velocity components
 
 # This FIRST random seed is used for all the following random nr. calculations!!!!
-variable vx equal random(0,${vel},5974)
+variable vx equal random(0,${vel},10516)
 variable v1 equal ${vx}
 variable vtemp1 equal "(v_v0^2 - v_v1^2)^(1./2.)"
 # this random seed is NOT used
@@ -121,19 +146,30 @@ print "Velocity vz: ${vz}"
 
 #choose random atom - this random seed is NOT used
 variable rn_id equal floor(random(0,${tmp2},4025)) 
-print "Random id: ${rn_id}"
+variable a equal ${rn_id}
+print "Random id: ${a}"
 
 #define group that contains the chosen atom
-group ${i} id ${rn_id}
+group ${i} id ${a}
 velocity ${i} set ${v1} ${v2} ${vz}
 
-
-
-run 1000
+run 10000
 
 #undump 1
 next i
-jump biax_recoil.in loop
+jump recoil.in loop
 
+fix 11 all dt/reset 1 ${dt_min} ${dt_max} ${x_max}
 ### last equilibrium step - check
 run 20000
+
+variable j loop ${i_max}
+label reset
+
+velocity ${j} set 0.0 0.0 0.0
+
+next j
+jump recoil.in reset
+
+run 100
+

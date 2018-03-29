@@ -7,10 +7,10 @@ variable temp_anneal equal 1400.
 variable temp_upper equal 3500.
 
 variable massvar 	equal 28.09
-variable unit_cell 	equal 4
+variable unit_cell 	equal 6
 variable eng_cell_k	equal 25		#Atoms per eV
 
-variable i_max equal 5
+variable i_max equal 10
 
 variable i loop ${i_max}
 variable ekin equal 50							#eV
@@ -18,8 +18,10 @@ variable vel equal "(2*v_ekin/v_massvar)^(1./2.)"
 variable v0 equal ${vel}
 print "Velocity v: ${v0}"
 
-variable cell_size	equal "floor((v_ekin*v_i_max*v_eng_cell_k/8.)^(1./3.)) + v_unit_cell + 1"
+variable cell_size	equal "floor((((v_ekin*v_i_max*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1"
 print "Cell_size a: ${cell_size}"
+#variable box_min equal "v_cell_size * -0.2"
+#variable box_max equal "v_cell_size * 1.2"
 
 boundary 	p p p
 atom_style	atomic
@@ -29,6 +31,8 @@ neigh_modify	delay 1
 
 lattice			diamond 5.432
 
+
+#region			box block ${box_min} ${box_max} ${box_min} ${box_max} ${box_min} ${box_max}
 region			base block 0 ${cell_size} 0 ${cell_size} 0 ${cell_size} units lattice
 create_box		1 base
 create_atoms	1 region base
@@ -41,12 +45,16 @@ pair_coeff		* * Si.sw Si
 
 #Melting Step
 
+
+
+#fix 			1 all nvt temp ${temp_lower} ${temp_upper} 0.1 # iso 0. 10000. 0.5
+
 fix 			1 all nve
 fix 			2 all temp/berendsen ${temp_lower} ${temp_upper} 0.1
 #fix 			5 all press/berendsen iso 1.0 40000.0 1000.0
 
 timestep		0.01
-dump			1 all atom 100 dump.amorph1
+dump			1 all atom 100 dump.amorph
 thermo_style	custom step atoms temp epair etotal press
 thermo			100
 thermo_modify	lost ignore flush yes
@@ -55,19 +63,27 @@ run 10000
 
 #Quenching Step with optional Annhealing Step - ramp down 0.02K/fs
 
+#fix 			2 all npt temp ${temp_lower} ${temp_lower} 0.1 iso 0.0 0.0 0.5
 fix 			2 all temp/berendsen ${temp_upper} ${temp_upper} 0.1
-dump			2 all atom 100 dump.amorph2
+#dump			2 all atom 100 dump.amorph2
 
 run 4000
 
+#fix 			2 all npt temp ${temp_upper} ${temp_anneal} 0.1 iso 0.0 0.0 0.5
 fix 			2 all temp/berendsen ${temp_upper} ${temp_anneal} 0.1
-dump			3 all atom 100 dump.amorph3
+#dump			3 all atom 100 dump.amorph3
 
 run 10500
 
+#fix 			2 all npt temp ${temp_anneal} ${temp_lower} 0.1 iso 0.0 0.0 0.5
 fix 			2 all temp/berendsen ${temp_anneal} ${temp_lower} 0.1
-dump			5 all atom 100 dump.amorph5
+#dump			5 all atom 100 dump.amorph5
 
 run 5500
+
+#equilibriate
+fix 			2 all temp/berendsen ${temp_lower} ${temp_lower} 0.1
+run 2000
+
 
 write_data amorph.dat
