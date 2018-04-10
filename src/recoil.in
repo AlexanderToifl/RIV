@@ -2,25 +2,6 @@
 units 		metal
 boundary 	p p p
 
-variable temp_lower equal 10.
-variable temp_upper equal 10.
-variable massvar 	equal 28.09
-variable unit_cell 	equal 6
-variable eng_cell_k	equal 25		#Atoms per eV
-
-variable i_max equal 40				#Nr. of recoils
-variable i loop ${i_max}
-
-variable ekin equal 50						#eV
-variable vel equal "(2*1.602*10^(-19.) * v_ekin/(v_massvar*1.6605*10^(-27)))^(1./2.) / 100."
-variable v0 equal ${vel}
-print "Velocity v: ${v0}"
-
-variable cell_size	equal "(floor((((v_ekin*v_i_max*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1) * 0.9"
-variable xy_min equal "(floor((((v_ekin*v_i_max*v_eng_cell_k)/8.)^(1./3.)) + v_unit_cell) + 1) - v_cell_size"
-print "Cell_size a: ${cell_size}"
-
-
 
 lattice			diamond 5.432
 
