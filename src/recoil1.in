@@ -58,30 +58,41 @@ dump 1 all atom 200 dump_recoil
 
 ################# Thermostat and Zero Force Border #####################
 
-#geometry 
-variable zero_width equal 0.
 variable therstat_width equal 3.0
 
-variable zero_max_xy equal "(lx - v_zero_width)"
-variable zero_max_z equal "(lz - v_zero_width)"
 
-variable therstat_min equal "(v_zero_width + v_therstat_width)"
-variable therstat_max_xy equal "(lx - v_zero_width - v_therstat_width)"
-variable therstat_max_z equal "(lz - v_zero_width - v_therstat_width)"
+variable xl equal "xlo"
+variable xh equal "xhi"
 
-#thermostat
-#region     therstat_xz block -INF INF ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_z} units box
-#group	   therstat_inverse_group region therstat_inverse
-#group      thermo subtract all therstat_inverse_group
+variable yl equal "ylo"
+variable yh equal "yhi"
 
-#fix	    5 thermo temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
+variable zl equal "zlo"
+variable zh equal "zhi"
+
+#xy
+region     therstat_xy block ${xl} ${xh} ${yl} ${yh} ${zl} ${therstat_width} units box
+group	   therstat_xy_group dynamic all region therstat_xy every 10
+
+#xz
+region     therstat_xz block ${xl} ${xh} ${yl} ${therstat_width} ${zl}  ${zh}  units box
+group	   therstat_xz_group  dynamic all region  therstat_xz every 10
+
+#yz
+region     therstat_yz  block ${xl}   ${therstat_width} ${yl} ${yh}  ${zl} ${zh} units box
+group	   therstat_yz_group  dynamic all region  therstat_yz every 10
+
+
+fix	    51 therstat_xy_group temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
+fix	    52 therstat_xz_group temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
+fix	    53 therstat_yz_group temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
 
 ####################### Recoil Insertion ###############################
 variable tmp2 equal "atoms"
 
-variable x_max equal 0.002 # A
-variable dt_min equal 0.00000001 #ps
+variable x_max equal 0.01 # A
+variable dt_min equal 0.00001 #ps
 variable dt_max equal 10 #ps
 
 fix 11 all dt/reset 1 ${dt_min} ${dt_max} ${x_max} units box
@@ -98,20 +109,20 @@ label loop
 
 # This FIRST random seed is used for all the following random nr. calculations!!!!
 
-variable th_max  equal "PI"
-variable phi_max equal "2*PI"
+variable th_max  equal "2*PI"
+
 
 variable theta 	equal random(0,${th_max},10516)
-variable phi   	equal random(0,${phi_max},10516)
+variable u   	equal random(0,1,10516)
 
 variable th_tmp equal ${theta}
-variable ph_tmp equal ${phi}
+variable u_tmp equal ${u}
 
 
-variable vx equal "v_vel*sin(v_th_tmp)*sin(v_ph_tmp)"
+variable vx equal "v_vel * (1- v_u_tmp * v_u_tmp)^(0.5)*cos(v_th_tmp)"
 # this random seed is NOT used
-variable vy equal "v_vel*sin(v_th_tmp)*cos(v_ph_tmp)"
-variable vz equal "v_vel*cos(v_th_tmp)"
+variable vy equal "v_vel*(1- v_u_tmp * v_u_tmp)^(0.5)*sin(v_th_tmp)"
+variable vz equal "v_vel* v_u_tmp"
 print "Velocity vx: ${vx}"
 print "Velocity vy: ${vy}"
 print "Velocity vz: ${vz}"

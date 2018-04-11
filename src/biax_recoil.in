@@ -36,7 +36,7 @@ variable barostat_damp equal 100.0
 
 reset_timestep 0
 timestep		0.001
-#fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} iso 0.0 0.0 ${barostat_damp}
+fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} iso 0.0 0.0 ${barostat_damp}
 
 thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
 thermo			100
@@ -93,37 +93,6 @@ jump biax_recoil.in def
 
 thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
 
-################# Thermostat and Zero Force Border #####################
-
-#geometry 
-variable zero_width equal 0.
-variable therstat_width equal 3.0
-
-variable zero_max_xy equal "(lx - v_zero_width)"
-variable zero_max_z equal "(lz - v_zero_width)"
-
-variable therstat_min equal "(v_zero_width + v_therstat_width)"
-variable therstat_max_xy equal "(lx - v_zero_width - v_therstat_width)"
-variable therstat_max_z equal "(lz - v_zero_width - v_therstat_width)"
-
-
-variable therstat_damp equal 0.001
-
-#zero force
-#region     zero_force_inverse block ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_xy} ${zero_width} ${zero_max_z} units box
-#group	   zero_force_inverse_group region zero_force_inverse
-#group      zero_force subtract all  zero_force_inverse_group
-
-#fix        4 zero_force setforce 0.0 0.0 0.0
-
-
-
-#thermostat
-#region     therstat_inverse block ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_z} units box
-#group	   therstat_inverse_group region therstat_inverse
-#group      thermo subtract all therstat_inverse_group
-
-#fix	    5 thermo temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
 
 #equilibration to achieve temperature ${temp_lower}
