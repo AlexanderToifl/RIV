@@ -4,10 +4,10 @@ variable temp_anneal equal 1400.
 variable temp_upper equal 3500.
 
 variable massvar 	equal 28.09
-variable unit_cell 	equal 3		#6
-variable eng_cell_k	equal 1		#25	#Atoms per eV
+variable unit_cell 	equal 6		#6
+variable eng_cell_k	equal 5		#25	#Atoms per eV
 
-variable i_max equal 28
+variable i_max equal 25
 
 variable i loop ${i_max}
 variable ekin equal 50						#eV

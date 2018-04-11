@@ -49,8 +49,8 @@ def main():
     run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
     
     #recoil insertion2
-    prepand_variables(tmp_name, recoil2_name, setup_name)
-    run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
+    #prepand_variables(tmp_name, recoil2_name, setup_name)
+   # run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
     
     
 if __name__ == '__main__':

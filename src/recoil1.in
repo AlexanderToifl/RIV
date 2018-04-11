@@ -24,7 +24,7 @@ pair_style		sw
 pair_coeff		* * Si.sw Si
 
 variable therstat_damp equal 0.1
-variable barostat_damp equal 0.4
+variable barostat_damp equal 40
 
 reset_timestep 0
 timestep		0.001
@@ -63,23 +63,26 @@ variable therstat_width equal 3.0
 
 variable xl equal "xlo"
 variable xh equal "xhi"
+variable xt equal "(v_xl +v_therstat_width)"
 
 variable yl equal "ylo"
 variable yh equal "yhi"
+variable yt equal "(v_yl +v_therstat_width)"
 
 variable zl equal "zlo"
 variable zh equal "zhi"
+variable zt equal "(v_zl +v_therstat_width)"
 
 #xy
-region     therstat_xy block ${xl} ${xh} ${yl} ${yh} ${zl} ${therstat_width} units box
+region     therstat_xy block ${xl} ${xh} ${yl} ${yh} ${zl} ${zt}  units box
 group	   therstat_xy_group dynamic all region therstat_xy every 10
 
 #xz
-region     therstat_xz block ${xl} ${xh} ${yl} ${therstat_width} ${zl}  ${zh}  units box
+region     therstat_xz block ${xl} ${xh} ${yl} ${yt} ${zl}  ${zh}  units box
 group	   therstat_xz_group  dynamic all region  therstat_xz every 10
 
 #yz
-region     therstat_yz  block ${xl}   ${therstat_width} ${yl} ${yh}  ${zl} ${zh} units box
+region     therstat_yz  block ${xl}   ${xt}  ${yl} ${yh}  ${zl} ${zh} units box
 group	   therstat_yz_group  dynamic all region  therstat_yz every 10
 
 
@@ -113,7 +116,7 @@ variable th_max  equal "2*PI"
 
 
 variable theta 	equal random(0,${th_max},10516)
-variable u   	equal random(0,1,10516)
+variable u   	equal random(-1,1,10516)
 
 variable th_tmp equal ${theta}
 variable u_tmp equal ${u}
