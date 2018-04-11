@@ -7,7 +7,6 @@ boundary 	p p p
 
 atom_style	atomic
 
-
 lattice			diamond 5.432
 
 #region			box block 0 ${cell_size} 0 ${cell_size} ${box_min} ${box_max} units lattice
@@ -15,18 +14,12 @@ lattice			diamond 5.432
 
 #Load a-Si sample
 read_data amorph.dat #add merge
-
-
-
 variable tmp equal "lx"
 variable L0 equal ${tmp}
 print "Initial Length, L0: ${L0}"
 
 neighbor 		0.3 bin
 neigh_modify	delay 1
-
-
-
 
 #use Tersoff Potential
 mass			1 28.09
@@ -38,33 +31,20 @@ pair_coeff		* * Si.sw Si
 
 lattice			diamond 5.432
 
-
-variable 4 equal 0.1
 variable therstat_damp equal 1.0
-variable barostat_damp equal 0.5
+variable barostat_damp equal 100.0
 
 reset_timestep 0
 timestep		0.001
-fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} iso 0.0 0.0 ${barostat_damp}
+#fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} iso 0.0 0.0 ${barostat_damp}
 
 thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
 thermo			100
 thermo_modify	lost ignore flush yes
 
-
-
 dump 1 all atom 50 dump_biax_recoil
 
-#thermostat parameters
-#variable therstat_seed equal 23145
-#variable therstat_damp equal 0.5
-#fix	5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
-
-
-
-run 1000
-#unfix 5
-
+#run 5000
 
 ################### Biaxial deformation ################################
 
@@ -85,9 +65,10 @@ variable strainx equal "(lx - v_L0)/v_L0"
 variable strainy equal "(ly - v_L0)/v_L0"
 variable p1 equal "v_strainx"
 variable p2 equal "v_strainy"
-variable p3 equal "-pxx/100000"
-variable p4 equal "-pyy/100000"
-variable p5 equal "-pzz/100000"
+#Pressure in GPa
+variable p3 equal "-pxx/10000"
+variable p4 equal "-pyy/10000"
+variable p5 equal "-pzz/10000"
 fix def1 all print 100 "${p1} ${p2} ${p3} ${p4} ${p5}" file deformation.txt screen no
 
 variable n_steps loop 40
@@ -106,28 +87,11 @@ fix		3 all deform 1 x scale ${scale_factor} remap x
 run 100
 unfix 3
 
-#fix 	9 all box/relax z 0.0 vmax 0.01 nreset 100
-
 next n_steps
 jump biax_recoil.in def
 
-#thermostat parameters
-#variable therstat_seed equal 23145
-#variable therstat_damp equal 0.5
-#fix	    5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
-
-#fix	    5 all nvt/sllod temp ${temp_lower} ${temp_lower} ${therstat_damp}
-
-
-#unfix 5
-#unfix 4
-
 
 thermo_style custom step lx ly lz press pxx pyy pzz pe atoms temp 
-
-
-#fix		3 all deform 5 z scale 2.0 remap none
-#run 500
 
 ################# Thermostat and Zero Force Border #####################
 
@@ -155,64 +119,14 @@ variable therstat_damp equal 0.001
 
 
 #thermostat
-region     therstat_inverse block ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_z} units box
-group	   therstat_inverse_group region therstat_inverse
-group      thermo subtract all therstat_inverse_group
+#region     therstat_inverse block ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_xy} ${therstat_min} ${therstat_max_z} units box
+#group	   therstat_inverse_group region therstat_inverse
+#group      thermo subtract all therstat_inverse_group
 
-fix	    5 thermo temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
+#fix	    5 thermo temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
 
 #equilibration to achieve temperature ${temp_lower}
 run 10000	
 
 write_data deform.dat
-
-
-####################### Recoil Insertion ###############################
-variable tmp2 equal "atoms"
-
-variable x_max equal 0.002# A
-variable dt_min equal 0.000000001 #fs
-variable dt_max equal 10 # fs
-
-timestep ${dt_max}
-fix 11 all dt/reset 1 ${dt_min} ${dt_max} ${x_max}
-
-#Start loop
-
-label loop
-#dump 1 all atom 100 testfile.$i
-
-### Calculate velocity components
-
-# This FIRST random seed is used for all the following random nr. calculations!!!!
-#variable vx equal random(0,${vel},28)
-#variable v1 equal ${vx}
-#variable vtemp1 equal "(v_v0^2 - v_v1^2)^(1./2.)"
-## this random seed is NOT used
-#variable vy equal random(0,${vtemp1},2254)
-#variable v2 equal ${vy}
-#variable vz equal "(v_v0^2 - v_v1^2 - v_v2^2)^(1./2.)"
-#print "Velocity vx: ${v1}"
-#print "Velocity vy: ${v2}"
-#print "Velocity vz: ${vz}"
-
-#choose random atom - this random seed is NOT used
-#variable rn_id equal floor(random(0,${tmp2},4025)) 
-#print "Random id: ${rn_id}"
-
-#define group that contains the chosen atom
-#group ${i} id ${rn_id}
-#velocity ${i} set ${v1} ${v2} ${vz}
-
-
-
-run 1000
-
-#undump 1
-next i
-jump biax_recoil.in loop
-
-### last equilibrium step - check
-run 20000
-

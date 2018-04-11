@@ -29,11 +29,12 @@ def main():
     setup_name = 'setup.in'
     amorph_name = 'amorph.in'
     biax_name = 'biax_recoil.in'
-    recoil_name = 'recoil.in'
+    recoil1_name = 'recoil1.in'
+    recoil2_name = 'recoil2.in'
     
     tmp_name = 'riv_tmp.in'
     
-    core_nr = 4
+    core_nr = 8
     
     #amorphization
     prepand_variables(tmp_name, amorph_name, setup_name)
@@ -43,8 +44,12 @@ def main():
     prepand_variables(tmp_name, biax_name, setup_name)
     run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
     
-    #recoil insertion
-    prepand_variables(tmp_name, recoil_name, setup_name)
+    #recoil insertion1
+    prepand_variables(tmp_name, recoil1_name, setup_name)
+    run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
+    
+    #recoil insertion2
+    prepand_variables(tmp_name, recoil2_name, setup_name)
     run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
     
     

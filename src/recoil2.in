@@ -6,7 +6,7 @@ lattice			diamond 5.432
 variable box_min equal "v_cell_size * -0.2"
 variable box_max equal "v_cell_size * 1.3"
 
-read_data deform.dat #add merge
+read_data recoil1.dat #add merge
 
 variable tmp equal "lx"
 variable L0 equal ${tmp}
@@ -43,7 +43,7 @@ variable p2 equal "v_strainy"
 variable p3 equal "-pxx/10000"
 variable p4 equal "-pyy/10000"
 variable p5 equal "-pzz/10000"
-fix def1 all print 500 "step ${p1} ${p2} ${p3} ${p4} ${p5}" file deformation_recoil.txt screen no
+fix def1 all print 500 "step ${p1} ${p2} ${p3} ${p4} ${p5}" file recoil2.txt screen no
 
 dump 1 all atom 200 dump_recoil
 
@@ -133,7 +133,7 @@ run 10000
 
 #undump 1
 next i
-jump recoil.in loop
+jump recoil2.in loop
 
 ### last equilibrium step - check
 run 20000
@@ -144,9 +144,9 @@ label reset
 velocity ${j} set 0.0 0.0 0.0 units box
 
 next j
-jump recoil.in reset
+jump recoil2.in reset
 
-write_data recoil1.dat
+write_data recoil2.dat
 
 run 100
 
