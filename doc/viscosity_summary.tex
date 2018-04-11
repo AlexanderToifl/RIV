@@ -489,20 +489,17 @@ Als einzigen Vergleichswert für a-Si findet man in \cite{Vauth2007} $\eta(T=\SI
 			\abs{v} = \sqrt{\frac{2E_{kin}}{m}},
 			\label{eq:vel}
 		\end{equation}
-		wobei die erste Geschwindigkeitskomponente ($v_x$) wiederum aus einer gleichverteilten Zufallsvariable (begrenzt durch den Betrag \ref{eq:vel}) erzeugt wird. Die zweite Komponente ($v_y$) wird ebenfalls zufällig erzeugt (mithilfe des verbleibenden Geschw.betrages), 
-		$v_z$ ergibt sich damit automatisch.
-		\begin{equation}
-			\abs{v} = \sqrt{\abs{v_x}^2+\abs{v_y}^2+\abs{v_z}^2}
-		\end{equation}
-		\begin{equation}
-			\abs{v_x} = \mathrm{rand}\left(0,\abs{v}\right) 
-		\end{equation}
-		\begin{equation}
-			\abs{v_y} = \mathrm{rand}\left(0,\sqrt{\abs{v}^2-\abs{v_x}^2}\right)
-		\end{equation}
-		\begin{equation}
-			\abs{v_z} = \sqrt{\abs{v}^2-\abs{v_x}^2-\abs{v_y}^2}
-		\end{equation}
+		wobei die Geschwindigkeitskomponenten mittels Kugelkoordinaten berechnet werden. Dabei muss beachtet werden, dass die Geschwindigkeitsvektor \textbf{gleichverteilt auf der Kugeloberfläche} sind, also jedes differentielle Raumwinkelelement $\mathrm{d}\Omega = \sin \varphi\, \mathrm{d} \theta \,\mathrm{d} \varphi$ mit der selben Wahrscheinlichkeit ausgewählt wird. Da $\mathrm{d}\Omega$ von $\varphi$ abhängt, wird $u=\cos \varphi$ als gleichverteilt im Intervall $[-1,1]$ und $\theta$ als gleichverteilt in $[0,2\pi)$ angenommen. Die Geschwindigkeitskomponenten ergeben sich dann als\cite{weisstein2002sphere}
+		
+		\begin{align}
+		v_x &= \abs{v}\, \sqrt{1 - u^2} \cos \varphi \\
+		v_y &= \abs{v}\, \sqrt{1 - u^2} \sin \varphi \\
+		v_z &= \abs{v}\, u.
+\end{align}				
+		
+      
+		
+		
 		\item Die Größe der Simulationsbox wird ebenfalls anhand der durch Recoils eingebrachten kinetischen Energie berechnet. Ausgehend von einer minimalen Simulationsbox, werden pro eV kinetischer Energie eine gewisse Anzahl Atome simuliert.
 		\item Randbedingungen verwenden um Aufheizen zu vermeiden - vgl. Sputtern
 	\end{itemize}
