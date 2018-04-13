@@ -43,7 +43,14 @@ variable p2 equal "v_strainy"
 variable p3 equal "-pxx/10000"
 variable p4 equal "-pyy/10000"
 variable p5 equal "-pzz/10000"
-fix def1 all print 500 "step ${p1} ${p2} ${p3} ${p4} ${p5}" file recoil1.txt screen no
+variable st equal "step"
+variable at equal "atoms"
+variable tst equal "dt"
+variable tem equal "temp"
+variable LX equal "lx"
+variable LY equal "ly"
+variable LZ equal "lz"
+fix def1 all print 500 "${st} ${p1} ${p2} ${p3} ${p4} ${p5} ${at} ${tst} ${tem} ${LX} ${LY} ${LZ}" file recoil1.txt screen no
 
 dump 1 all atom 200 dump_recoil
 
@@ -53,7 +60,7 @@ dump 1 all atom 200 dump_recoil
 #fix	5 all temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
 
 
-#run 500
+run 500
 #unfix 5
 
 ################# Thermostat and Zero Force Border #####################
@@ -63,24 +70,27 @@ variable therstat_width equal 3.0
 
 variable xl equal "xlo"
 variable xh equal "xhi"
+variable xth equal "xlo + v_therstat_width"
 
 variable yl equal "ylo"
 variable yh equal "yhi"
+variable yth equal "ylo + v_therstat_width"
 
 variable zl equal "zlo"
 variable zh equal "zhi"
+variable zth equal "zlo + v_therstat_width"
 
 #xy
-region     therstat_xy block ${xl} ${xh} ${yl} ${yh} ${zl} ${therstat_width} units box
+region	   therstat_xy block ${xl} ${xh} ${yl} ${yh} ${zl} ${zth} units box
 group	   therstat_xy_group dynamic all region therstat_xy every 10
 
 #xz
-region     therstat_xz block ${xl} ${xh} ${yl} ${therstat_width} ${zl}  ${zh}  units box
-group	   therstat_xz_group  dynamic all region  therstat_xz every 10
+region	   therstat_xz block ${xl} ${xh} ${yl} ${yth} ${zl} ${zh} units box
+group	   therstat_xz_group dynamic all region therstat_xz every 10
 
 #yz
-region     therstat_yz  block ${xl}   ${therstat_width} ${yl} ${yh}  ${zl} ${zh} units box
-group	   therstat_yz_group  dynamic all region  therstat_yz every 10
+region     therstat_yz block ${xl} ${xth} ${yl} ${yh} ${zl} ${zh} units box
+group	   therstat_yz_group dynamic all region therstat_yz every 10
 
 
 fix	    51 therstat_xy_group temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
@@ -112,8 +122,8 @@ label loop
 variable th_max  equal "2*PI"
 
 
-variable theta 	equal random(0,${th_max},10516)
-variable u   	equal random(0,1,10516)
+variable theta 	equal random(0,${th_max},${seed})
+variable u   	equal random(-1,1,${seed})
 
 variable th_tmp equal ${theta}
 variable u_tmp equal ${u}
@@ -128,7 +138,7 @@ print "Velocity vy: ${vy}"
 print "Velocity vz: ${vz}"
 
 #choose random atom - this random seed is NOT used
-variable rn_id equal floor(random(0,${tmp2},4025)) 
+variable rn_id equal floor(random(0,${tmp2},${seed})) 
 variable a equal ${rn_id}
 print "Random id: ${a}"
 
@@ -147,7 +157,7 @@ next i
 jump recoil1.in loop
 
 ### last equilibrium step - check
-run 20000
+run 1000
 
 variable j loop ${i_max}
 label reset
