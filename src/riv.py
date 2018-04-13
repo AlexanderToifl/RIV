@@ -122,9 +122,15 @@ def main():
 			#prepand_variables(tmp_name, recoil1_name, setup_name)
 			#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
     
+<<<<<<< HEAD
 			#recoil insertion2
 			#prepand_variables(tmp_name, recoil2_name, setup_name)
 			#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
+=======
+    #recoil insertion2
+    #prepand_variables(tmp_name, recoil2_name, setup_name)
+   # run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
+>>>>>>> 28a5cf94a04d4ca8c5bc1c7a76a65387b3805fa4
     
 			crvname = save_data(logname,Ekin[i],seeds[j])
 			outname = 'data/png/rec_e' + str(Ekin[i]) + '_s_' + str(seeds[j]) + '.png'
