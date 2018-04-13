@@ -24,7 +24,7 @@ pair_style		sw
 pair_coeff		* * Si.sw Si
 
 variable therstat_damp equal 0.1
-variable barostat_damp equal 40
+variable barostat_damp equal 1.
 
 reset_timestep 0
 timestep		0.001
@@ -157,7 +157,7 @@ next i
 jump recoil1.in loop
 
 ### last equilibrium step - check
-run 1000
+run 10000
 
 variable j loop ${i_max}
 label reset

@@ -73,19 +73,21 @@ def main():
     
 	timestep = 500	#dumptime for logging
 	
-	Er = 1500.		#eV
 	Ed = 10.		#eV
 	Ebi = 111.2e9	#Pa
-    
-    
+        
 	core_nr = 8
-	recoil_nr = 1														#Nr of recoils inserted
+	recoil_nr = 25														#Nr of recoils inserted
 	base_cell = 6
 	at_per_ev = 1
-	
-	Ekin = [1500]#[10,20,50,100,500,1500]								#kinetic Energy set in eV
-	seeds = [10516]#[1235,7365,647,11837,23746,9,2923,8472,759,323]  	#set 1 (Alex)
+		
+	#Ekin = [10,20,50]													#Set1 (Alex) kinetic Energy set in eV
+	Ekin = [100,500,1000]												#Set2 (Christian) kinetic Energy set in eV
+	seeds = [10516]	 	
 
+	size_auto = False
+	cell_size = 19														#fixed cell_size in lattice units
+	
     #set Variables 
     
     #amorphization
@@ -97,14 +99,17 @@ def main():
 	#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
     
 	RIV = []
-    
 
 	change_var(setup_name,'i_max',recoil_nr)
 	change_var(setup_name,'unit_cell',base_cell)
 	change_var(setup_name,'eng_cell_k',at_per_ev)
     
 	for i in range(len(Ekin)):
-
+		
+		if size_auto == True:
+			cell_size = int((((Ekin[i]*recoil_nr*at_per_ev)/8.)^(1./3.)) + base_cell) + 1	
+		
+		change_var(setup_name,'cell_size',cell_size)
 		change_var(setup_name,'ekin',Ekin[i])
 		#amorphization
 		#prepand_variables(tmp_name, amorph_name, setup_name)
@@ -118,7 +123,7 @@ def main():
 			
 			change_var(setup_name,'seed',seeds[j])
    
-			recoil insertion1
+			#recoil insertion1
 			prepand_variables(tmp_name, recoil1_name, setup_name)
 			run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
 
@@ -140,12 +145,11 @@ def main():
 			
 			#extracten and plotten
 			
-			RIV.append(plot.extract_plot(crvname,outname,timestep,Er,Ed,Ebi))
+			RIV.append(plot.extract_plot(crvname,outname,timestep,Ekin[i],Ed,Ebi))
 
-    
-		datname = 'data/riv/recoil_e_' + str(Ekin[0]) +'.crv'
-
-		write_crv(datname,seeds,RIV)		
+			datname = 'data/riv/recoil_e_' + str(Ekin[i]) + 'seed_' + str(seeds[j]) + '.crv'
+			write_crv(datname,seeds,RIV)	
+				
 		
 if __name__ == '__main__':
     main()
