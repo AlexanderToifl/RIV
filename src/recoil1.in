@@ -67,32 +67,9 @@ run 500
 
 variable therstat_width equal 3.0
 
-
 variable xl equal "xlo"
 variable xh equal "xhi"
-<<<<<<< HEAD
-variable xth equal "xlo + v_therstat_width"
 
-variable yl equal "ylo"
-variable yh equal "yhi"
-variable yth equal "ylo + v_therstat_width"
-
-variable zl equal "zlo"
-variable zh equal "zhi"
-variable zth equal "zlo + v_therstat_width"
-
-#xy
-region	   therstat_xy block ${xl} ${xh} ${yl} ${yh} ${zl} ${zth} units box
-group	   therstat_xy_group dynamic all region therstat_xy every 10
-
-#xz
-region	   therstat_xz block ${xl} ${xh} ${yl} ${yth} ${zl} ${zh} units box
-group	   therstat_xz_group dynamic all region therstat_xz every 10
-
-#yz
-region     therstat_yz block ${xl} ${xth} ${yl} ${yh} ${zl} ${zh} units box
-group	   therstat_yz_group dynamic all region therstat_yz every 10
-=======
 variable xt equal "(v_xl +v_therstat_width)"
 
 variable yl equal "ylo"
@@ -114,7 +91,6 @@ group	   therstat_xz_group  dynamic all region  therstat_xz every 10
 #yz
 region     therstat_yz  block ${xl}   ${xt}  ${yl} ${yh}  ${zl} ${zh} units box
 group	   therstat_yz_group  dynamic all region  therstat_yz every 10
->>>>>>> 28a5cf94a04d4ca8c5bc1c7a76a65387b3805fa4
 
 
 fix	    51 therstat_xy_group temp/berendsen ${temp_lower} ${temp_lower} ${therstat_damp}
@@ -145,14 +121,9 @@ label loop
 
 variable th_max  equal "2*PI"
 
-
-<<<<<<< HEAD
 variable theta 	equal random(0,${th_max},${seed})
 variable u   	equal random(-1,1,${seed})
-=======
-variable theta 	equal random(0,${th_max},10516)
-variable u   	equal random(-1,1,10516)
->>>>>>> 28a5cf94a04d4ca8c5bc1c7a76a65387b3805fa4
+
 
 variable th_tmp equal ${theta}
 variable u_tmp equal ${u}
