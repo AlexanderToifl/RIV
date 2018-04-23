@@ -88,9 +88,3 @@ def extract_plot(crvfile, outname, timestep, Er, Ed, Ebi):
 	
 
 	
-
-
-
-
-
-

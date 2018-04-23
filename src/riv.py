@@ -20,7 +20,7 @@ def change_var(fname, variable, value):
 			fout.write(line.encode('utf8'))
 		os.rename(fout.name, fname)    
     	
-def run_lammps(fname,core_nr, lammps_name='lammps-daily'):
+def run_lammps(fname,core_nr, lammps_name='lmp_jpeg'):
     call = "mpirun -np %s %s -in %s" %(core_nr, lammps_name,fname)
     print "Calling \"" + call + "\""
     #command as you type it incmd line 
@@ -76,17 +76,17 @@ def main():
 	Ed = 10.		#eV
 	Ebi = 111.2e9	#Pa
         
-	core_nr = 8
+	core_nr = 12
 	recoil_nr = 25														#Nr of recoils inserted
 	base_cell = 6
 	at_per_ev = 1
 		
-	#Ekin = [10,20,50]													#Set1 (Alex) kinetic Energy set in eV
-	Ekin = [100,500,1000]												#Set2 (Christian) kinetic Energy set in eV
+	Ekin = [10]													#Set1 (Alex) kinetic Energy set in eV
+	#Ekin = [100,500,1000]												#Set2 (Christian) kinetic Energy set in eV
 	seeds = [10516]	 	
 
 	size_auto = False
-	cell_size = 19														#fixed cell_size in lattice units
+	cell_size = 18													#fixed cell_size in lattice units
 	
     #set Variables 
     
@@ -114,10 +114,12 @@ def main():
 		#amorphization
 		#prepand_variables(tmp_name, amorph_name, setup_name)
 		#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
-    
+		
 		#biaxial deformation
-		#prepand_variables(tmp_name, biax_name, setup_name)
-		#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
+		prepand_variables(tmp_name, biax_name, setup_name)
+		run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
+        
+		exit(0)
 		
 		for j in range(len(seeds)):
 			

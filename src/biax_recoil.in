@@ -23,13 +23,14 @@ neigh_modify	delay 1
 
 #use Tersoff Potential
 mass			1 28.09
-#pair_style		tersoff
+#pair_style		sw
+#pair_coeff		* * Si.sw Si
+
+pair_style	    tersoff/zbl
+pair_coeff		* * SiC.tersoff.zbl Si
+
+#pair_style	    tersoff
 #pair_coeff		* * Si.tersoff Si
-
-pair_style		sw
-pair_coeff		* * Si.sw Si
-
-lattice			diamond 5.432
 
 variable therstat_damp equal 1.0
 variable barostat_damp equal 100.0

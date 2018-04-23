@@ -1,7 +1,7 @@
 
 variable temp_lower equal 10.
 variable temp_anneal equal 1400. 
-variable temp_upper equal 3500.
+variable temp_upper equal 6000.
 variable massvar 	equal 28.09
 
 
@@ -11,13 +11,13 @@ variable i_max equal 25
 
 
 variable i loop ${i_max}
-variable ekin equal 100
+variable ekin equal 10
 variable vel equal "(2*1.602*10^(-19.) * v_ekin/(v_massvar*1.6605*10^(-27)))^(1./2.) / 100."
 
 variable v0 equal ${vel}
 print "Velocity v: ${v0}"
 
-variable cell_size equal 19
+variable cell_size equal 18
 print "Cell_size a: ${cell_size}"
 
 variable seed equal 10516
