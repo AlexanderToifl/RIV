@@ -17,22 +17,23 @@ neigh_modify	delay 1
 
 #use Tersoff Potential
 mass			* 28.09
+#pair_style		tersoff
+#pair_coeff		* * Si.tersoff Si
+
 #pair_style		sw
 #pair_coeff		* * Si.sw Si
 
 pair_style	    tersoff/zbl
 pair_coeff		* * SiC.tersoff.zbl Si
 
-#pair_style	    tersoff
-#pair_coeff		* * Si.tersoff Si
-
-variable therstat_damp equal 0.1
+variable npt_therstat_damp equal 1000
+variable therstat_damp equal 0.05
 variable barostat_damp equal 1.
 
 reset_timestep 0
 timestep		0.001
 
-fix 			1 all npt temp ${temp_lower} ${temp_lower} ${therstat_damp} z 0.0 0.0 ${barostat_damp}
+fix 			1 all npt temp ${temp_lower} ${temp_lower} ${npt_therstat_damp} z 0.0 0.0 ${barostat_damp}
 
 thermo_style 	custom step lx ly lz press pxx pyy pzz pe atoms temp dt
 thermo			100
@@ -68,7 +69,7 @@ run 500
 
 ################# Thermostat and Zero Force Border #####################
 
-variable therstat_width equal 3.0
+variable therstat_width equal 8.7
 
 variable xl equal "xlo"
 variable xh equal "xhi"
@@ -153,7 +154,8 @@ velocity ${i} set ${vx} ${vy} ${vz} units box
 #reset_timestep 0
 #timestep	${dt_new}
 
-run 10000
+#30000 for recoil energy >= 500 eV, otherwise 20000 is sufficient
+run 30000
 
 #undump 1
 next i
@@ -173,4 +175,3 @@ jump recoil1.in reset
 write_data recoil1.dat
 
 run 100
-
