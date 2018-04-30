@@ -116,10 +116,10 @@ def main():
 		#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
 		
 		#biaxial deformation
-		prepand_variables(tmp_name, biax_name, setup_name)
-		run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
+		#prepand_variables(tmp_name, biax_name, setup_name)
+		#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
         
-		exit(0)
+		
 		
 		for j in range(len(seeds)):
 			
@@ -128,7 +128,7 @@ def main():
 			#recoil insertion1
 			prepand_variables(tmp_name, recoil1_name, setup_name)
 			run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
-
+			exit(0)
 			#recoil insertion2
 			#prepand_variables(tmp_name, recoil2_name, setup_name)
 			#run_lammps(tmp_name, core_nr)#, lammps_name='lmp_jpeg')
